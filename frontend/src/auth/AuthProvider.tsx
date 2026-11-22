@@ -52,6 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [clearAuth])
 
+  useEffect(() => {
+    const onExpired = () => {
+      clearAuth()
+    }
+    window.addEventListener('auth:expired', onExpired)
+    return () => window.removeEventListener('auth:expired', onExpired)
+  }, [clearAuth])
+
   const signUp = useCallback(
     async (input: SignUpInput) => {
       const domain = env?.allowedEmailDomain ?? 'thapar.edu'

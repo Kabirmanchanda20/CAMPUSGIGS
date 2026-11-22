@@ -12,6 +12,11 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 })
 
+function sanitizeFilename(name: string): string {
+  const base = name.replace(/[^a-zA-Z0-9._-]/g, '_')
+  return base.slice(-100) || 'file'
+}
+
 uploadsRouter.post(
   '/avatar',
   requireAuth,
@@ -22,7 +27,8 @@ uploadsRouter.post(
     if (!allowed.includes(req.file.mimetype)) {
       throw new AppError(400, 'VALIDATION_ERROR', 'Invalid image type')
     }
-    const path = `${req.user!.id}/${Date.now()}-${req.file.originalname}`
+    const safeName = sanitizeFilename(req.file.originalname)
+    const path = `${req.user!.id}/${Date.now()}-${safeName}`
     const { error } = await supabaseAdmin.storage.from('avatars').upload(path, req.file.buffer, {
       contentType: req.file.mimetype,
       upsert: true,
@@ -51,7 +57,8 @@ uploadsRouter.post(
     if (!allowed.includes(req.file.mimetype)) {
       throw new AppError(400, 'VALIDATION_ERROR', 'Invalid file type')
     }
-    const path = `${req.user!.id}/${taskId}/${Date.now()}-${req.file.originalname}`
+    const safeName = sanitizeFilename(req.file.originalname)
+    const path = `${req.user!.id}/${taskId}/${Date.now()}-${safeName}`
     const { error } = await supabaseAdmin.storage.from('proofs').upload(path, req.file.buffer, {
       contentType: req.file.mimetype,
       upsert: false,

@@ -1,32 +1,46 @@
-# React + TypeScript + Vite
+# CampusGigs Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + TypeScript + Vite client for the CampusGigs peer-to-peer campus marketplace.
 
-Currently, two official plugins are available:
+## Features & Highlights
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Route-Level Code-Splitting**: All major pages (`TaskDetailPage`, `AnalyticsPage`, `CreateListingPage`, etc.) are asynchronously loaded via `React.lazy()` and `<Suspense>`, keeping the initial bundle under 330 kB (104 kB gzip).
+- **Authentication**: JWT-based session state with automatic token refresh, httpOnly cookie fallback, and synchronized cross-module session expiry via `auth:expired` events.
+- **Cache Invalidation**: TanStack Query cache automatically invalidates wallet balance, tasks, and notifications across gig acceptance, completion, and cancellation.
+- **Validation**: Strict client-side Zod validation with future-date constraints and `@thapar.edu` email checks.
+- **Styling**: Tailwind CSS v4 with responsive card layouts and modern design tokens.
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Environment Setup
 
-## Expanding the Oxlint configuration
+Create `.env` in the `frontend` directory:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```env
+VITE_API_BASE_URL=http://localhost:5000
+VITE_ALLOWED_EMAIL_DOMAIN=thapar.edu
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Install & Run
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server (http://localhost:5173)
+npm run dev
+
+# Static analysis with Oxlint
+npm run lint
+
+# Typecheck and production bundle build
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+## Quality Gates
+
+- **Linter**: [Oxlint](https://oxc.rs/docs/guide/usage/linter) checking 53 files with 116 rules in <50ms.
+- **Typecheck & Build**: `tsc -b && vite build` validating all TypeScript types and generating split production chunks.

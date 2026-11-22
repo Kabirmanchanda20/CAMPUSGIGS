@@ -67,6 +67,9 @@ api.interceptors.response.use(
         queue.forEach((p) => p.reject(err))
         queue = []
         tokenStore.clear()
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:expired'))
+        }
         return Promise.reject(error)
       } finally {
         refreshing = false

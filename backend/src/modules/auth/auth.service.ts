@@ -114,12 +114,24 @@ export async function refresh(refreshToken: string) {
     throw new AppError(401, 'TOKEN_EXPIRED', 'Refresh token invalid')
   }
 
-  const { rows } = await query<{ id: string; refresh_token_hash: string | null; email: string }>(
-    `select u.id, u.refresh_token_hash, u.email from app_users u where u.id = $1`,
+  const { rows } = await query<{
+    id: string
+    refresh_token_hash: string | null
+    email: string
+    is_suspended: boolean
+  }>(
+    `select u.id, u.refresh_token_hash, u.email, p.is_suspended
+     from app_users u
+     join profiles p on p.id = u.id
+     where u.id = $1`,
     [payload.sub],
   )
   const user = rows[0]
   if (!user?.refresh_token_hash) throw new AppError(401, 'TOKEN_EXPIRED', 'Refresh token revoked')
+  if (user.is_suspended) {
+    await query(`update app_users set refresh_token_hash = null where id = $1`, [user.id])
+    throw new AppError(403, 'SUSPENDED', 'Account suspended')
+  }
 
   const match = await verifyTokenHash(refreshToken, user.refresh_token_hash)
   if (!match) {

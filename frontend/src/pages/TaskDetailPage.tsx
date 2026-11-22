@@ -308,7 +308,7 @@ export function TaskDetailPage() {
           </section>
         )}
 
-        {task.status === 'completed' && isParticipant && (
+        {task.status === 'completed' && isParticipant && !!task.worker_id && (
           <section className="mt-8 space-y-3 border-t border-border pt-6">
             <h2 className="font-display text-lg font-semibold">Leave a review</h2>
             <SelectStars value={stars} onChange={setStars} />
@@ -318,7 +318,7 @@ export function TaskDetailPage() {
               onClick={() =>
                 void run(async () => {
                   const revieweeId = isPoster ? task.worker_id : task.poster_id
-                  if (!revieweeId) throw new Error('No counterparty to review')
+                  if (!revieweeId) return
                   await createReview.mutateAsync({
                     taskId: task.id,
                     revieweeId,

@@ -31,21 +31,31 @@ const taskSelect = `
   ) end as worker
 `
 
-const createSchema = z.object({
-  title: z.string().min(5),
-  description: z.string().min(20),
-  category_id: z.string().uuid(),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
-  listing_type: z.enum(['gig', 'workshop', 'project', 'mentorship']),
-  budget: z.number().min(0).max(10000).optional().nullable(),
-  deadline: z.string().datetime().optional().nullable(),
-  venue: z.string().optional().nullable(),
-  mode: z.enum(['in_person', 'online', 'hybrid']).optional().nullable(),
-  starts_at: z.string().datetime().optional().nullable(),
-  ends_at: z.string().datetime().optional().nullable(),
-  max_participants: z.number().int().positive().optional().nullable(),
-  target_department_id: z.string().uuid().optional().nullable(),
-})
+const createSchema = z
+  .object({
+    title: z.string().min(5),
+    description: z.string().min(20),
+    category_id: z.string().uuid(),
+    difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
+    listing_type: z.enum(['gig', 'workshop', 'project', 'mentorship']),
+    budget: z.number().min(0).max(10000).optional().nullable(),
+    deadline: z.string().datetime().optional().nullable(),
+    venue: z.string().optional().nullable(),
+    mode: z.enum(['in_person', 'online', 'hybrid']).optional().nullable(),
+    starts_at: z.string().datetime().optional().nullable(),
+    ends_at: z.string().datetime().optional().nullable(),
+    max_participants: z.number().int().positive().optional().nullable(),
+    target_department_id: z.string().uuid().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.starts_at && data.ends_at) {
+        return new Date(data.ends_at).getTime() > new Date(data.starts_at).getTime()
+      }
+      return true
+    },
+    { message: 'ends_at must be after starts_at', path: ['ends_at'] },
+  )
 
 tasksRouter.get(
   '/',
@@ -77,8 +87,9 @@ tasksRouter.get(
       i++
     }
     if (req.query.q) {
+      const sanitizedQ = String(req.query.q).replace(/[%_\\]/g, '\\$&')
       where += ` and t.title ilike $${i++}`
-      vals.push(`%${req.query.q}%`)
+      vals.push(`%${sanitizedQ}%`)
     }
 
     const sort = (req.query.sort as string) || 'newest'
@@ -283,6 +294,23 @@ tasksRouter.post(
       await client.query(`update tasks set status = 'cancelled', updated_at = now() where id = $1`, [
         task.id,
       ])
+      const { rows: pendingApps } = await client.query<{ applicant_id: string }>(
+        `update applications set status = 'rejected' where task_id = $1 and status = 'pending' returning applicant_id`,
+        [task.id],
+      )
+      for (const p of pendingApps) {
+        await client.query(
+          `insert into notifications (user_id, type, payload) values ($1, 'task_cancelled', $2)`,
+          [p.applicant_id, JSON.stringify({ task_id: task.id })],
+        )
+      }
+      if (task.worker_id) {
+        const otherId = req.user!.id === task.poster_id ? task.worker_id : task.poster_id
+        await client.query(
+          `insert into notifications (user_id, type, payload) values ($1, 'task_cancelled', $2)`,
+          [otherId, JSON.stringify({ task_id: task.id })],
+        )
+      }
       await client.query('commit')
       res.json({ success: true, data: null })
     } catch (e) {
@@ -298,16 +326,39 @@ tasksRouter.post(
   '/:id/complete-workshop',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const { rows } = await query(`select * from tasks where id = $1`, [req.params.id])
-    const task = rows[0]
-    if (!task) throw new AppError(404, 'NOT_FOUND', 'Task not found')
-    if (task.poster_id !== req.user!.id) throw new AppError(403, 'FORBIDDEN', 'Only host')
-    if (task.listing_type !== 'workshop' || task.status !== 'open') {
-      throw new AppError(400, 'INVALID_STATUS', 'Only open workshops')
+    const client = await pool.connect()
+    try {
+      await client.query('begin')
+      const { rows } = await client.query(`select * from tasks where id = $1 for update`, [req.params.id])
+      const task = rows[0]
+      if (!task) throw new AppError(404, 'NOT_FOUND', 'Task not found')
+      if (task.poster_id !== req.user!.id) throw new AppError(403, 'FORBIDDEN', 'Only host')
+      if (task.listing_type !== 'workshop' || task.status !== 'open') {
+        throw new AppError(400, 'INVALID_STATUS', 'Only open workshops')
+      }
+      await client.query(`update tasks set status = 'completed', updated_at = now() where id = $1`, [
+        task.id,
+      ])
+      await client.query(`update profiles set completed_count = completed_count + 1 where id = $1`, [
+        task.poster_id,
+      ])
+      const { rows: attendees } = await client.query<{ applicant_id: string }>(
+        `select applicant_id from applications where task_id = $1`,
+        [task.id],
+      )
+      for (const a of attendees) {
+        await client.query(
+          `insert into notifications (user_id, type, payload) values ($1, 'workshop_completed', $2)`,
+          [a.applicant_id, JSON.stringify({ task_id: task.id, title: task.title })],
+        )
+      }
+      await client.query('commit')
+      res.json({ success: true, data: null })
+    } catch (e) {
+      await client.query('rollback')
+      throw e
+    } finally {
+      client.release()
     }
-    await query(`update tasks set status = 'completed', updated_at = now() where id = $1`, [
-      task.id,
-    ])
-    res.json({ success: true, data: null })
   }),
 )

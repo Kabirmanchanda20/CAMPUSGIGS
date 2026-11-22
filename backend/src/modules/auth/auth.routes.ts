@@ -8,17 +8,20 @@ import { loginSchema, signupSchema } from './auth.schema.js'
 
 export const authRouter = Router()
 
+const REFRESH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  path: '/api/v1/auth',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+}
+
 authRouter.post(
   '/signup',
   validate({ body: signupSchema }),
   asyncHandler(async (req, res) => {
     const data = await authService.signup(req.body)
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    res.cookie('refreshToken', data.refreshToken, REFRESH_COOKIE_OPTIONS)
     res.status(201).json({
       success: true,
       data: { accessToken: data.accessToken, profile: data.profile },
@@ -31,12 +34,7 @@ authRouter.post(
   validate({ body: loginSchema }),
   asyncHandler(async (req, res) => {
     const data = await authService.login(req.body.email, req.body.password)
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    res.cookie('refreshToken', data.refreshToken, REFRESH_COOKIE_OPTIONS)
     res.json({
       success: true,
       data: { accessToken: data.accessToken, profile: data.profile },
@@ -56,12 +54,7 @@ authRouter.post(
       return
     }
     const data = await authService.refresh(token)
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    res.cookie('refreshToken', data.refreshToken, REFRESH_COOKIE_OPTIONS)
     res.json({ success: true, data: { accessToken: data.accessToken } })
   }),
 )
@@ -71,7 +64,7 @@ authRouter.post(
   requireAuth,
   asyncHandler(async (req, res) => {
     await authService.logout(req.user!.id)
-    res.clearCookie('refreshToken')
+    res.clearCookie('refreshToken', { path: '/api/v1/auth' })
     res.json({ success: true, data: null })
   }),
 )

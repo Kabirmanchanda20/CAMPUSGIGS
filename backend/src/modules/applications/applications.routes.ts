@@ -27,6 +27,18 @@ applicationsRouter.post(
     if (!task) throw new AppError(404, 'NOT_FOUND', 'Task not found')
     if (task.status !== 'open') throw new AppError(400, 'INVALID_STATUS', 'Task not open')
     if (task.poster_id === req.user!.id) throw new AppError(400, 'INVALID', 'Cannot apply to own listing')
+    if (task.deadline && new Date(task.deadline) < new Date()) {
+      throw new AppError(400, 'DEADLINE_PASSED', 'Cannot apply to a task whose deadline has passed')
+    }
+    if (task.listing_type === 'workshop' && task.max_participants) {
+      const { rows: appCount } = await query<{ count: string }>(
+        `select count(*)::text as count from applications where task_id = $1 and status <> 'rejected'`,
+        [task.id],
+      )
+      if (Number(appCount[0]?.count ?? 0) >= task.max_participants) {
+        throw new AppError(400, 'WORKSHOP_FULL', 'Workshop has reached maximum participant capacity')
+      }
+    }
 
     const { rows } = await query(
       `insert into applications (task_id, applicant_id, message)
@@ -106,15 +118,20 @@ applicationsRouter.post(
         `update tasks set status = 'assigned', worker_id = $2, updated_at = now() where id = $1`,
         [app.task_id, app.applicant_id],
       )
-      await client.query(`update applications set status = 'accepted' where id = $1`, [app.id])
-      await client.query(
-        `update applications set status = 'rejected' where task_id = $1 and id <> $2 and status = 'pending'`,
+      const { rows: rejectedApps } = await client.query<{ applicant_id: string }>(
+        `update applications set status = 'rejected' where task_id = $1 and id <> $2 and status = 'pending' returning applicant_id`,
         [app.task_id, app.id],
       )
       await client.query(
         `insert into notifications (user_id, type, payload) values ($1, 'application_accepted', $2)`,
         [app.applicant_id, JSON.stringify({ task_id: app.task_id, application_id: app.id })],
       )
+      for (const r of rejectedApps) {
+        await client.query(
+          `insert into notifications (user_id, type, payload) values ($1, 'application_rejected', $2)`,
+          [r.applicant_id, JSON.stringify({ task_id: app.task_id })],
+        )
+      }
       await client.query('commit')
       res.json({ success: true, data: null })
     } catch (e) {
@@ -137,11 +154,33 @@ applicationsRouter.post(
     const app = rows[0]
     if (!app) throw new AppError(404, 'NOT_FOUND', 'Application not found')
     if (app.poster_id !== req.user!.id) throw new AppError(403, 'FORBIDDEN', 'Poster only')
+    if (app.status !== 'pending') {
+      throw new AppError(400, 'INVALID_STATUS', 'Only pending applications can be rejected')
+    }
     await query(`update applications set status = 'rejected' where id = $1`, [app.id])
     await query(
       `insert into notifications (user_id, type, payload) values ($1, 'application_rejected', $2)`,
       [app.applicant_id, JSON.stringify({ task_id: app.task_id })],
     )
+    res.json({ success: true, data: null })
+  }),
+)
+
+applicationsRouter.post(
+  '/:id/withdraw',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { rows } = await query(
+      `select a.* from applications a where a.id = $1`,
+      [req.params.id],
+    )
+    const app = rows[0]
+    if (!app) throw new AppError(404, 'NOT_FOUND', 'Application not found')
+    if (app.applicant_id !== req.user!.id) throw new AppError(403, 'FORBIDDEN', 'Applicant only')
+    if (app.status !== 'pending') {
+      throw new AppError(400, 'INVALID_STATUS', 'Only pending applications can be withdrawn')
+    }
+    await query(`delete from applications where id = $1`, [app.id])
     res.json({ success: true, data: null })
   }),
 )

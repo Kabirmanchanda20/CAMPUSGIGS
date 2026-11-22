@@ -32,6 +32,9 @@ adminRouter.post(
       req.params.id,
       req.body.suspended,
     ])
+    if (req.body.suspended) {
+      await query(`update app_users set refresh_token_hash = null where id = $1`, [req.params.id])
+    }
     res.json({ success: true, data: null })
   }),
 )

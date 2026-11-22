@@ -36,6 +36,10 @@ const schema = z.object({
   target_department_id: z.string().optional(),
 })
 
+function isPast(iso: string): boolean {
+  return new Date(iso).getTime() <= Date.now()
+}
+
 export function CreateListingPage() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
@@ -75,9 +79,22 @@ export function CreateListingPage() {
       return
     }
 
+    if (values.deadline && isPast(values.deadline)) {
+      setError('Deadline must be in the future')
+      return
+    }
+
     if (values.listing_type === 'workshop') {
       if (!values.starts_at) {
         setError('Workshop start is required')
+        return
+      }
+      if (isPast(values.starts_at)) {
+        setError('Workshop start time must be in the future')
+        return
+      }
+      if (values.ends_at && new Date(values.ends_at).getTime() <= new Date(values.starts_at).getTime()) {
+        setError('Workshop end time must be after start time')
         return
       }
       if (!values.mode) {

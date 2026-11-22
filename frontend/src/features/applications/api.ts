@@ -51,6 +51,7 @@ export function useAcceptApplication() {
       void qc.invalidateQueries({ queryKey: ['applications'] })
       void qc.invalidateQueries({ queryKey: ['task'] })
       void qc.invalidateQueries({ queryKey: ['my-tasks'] })
+      void qc.invalidateQueries({ queryKey: ['wallet'] })
     },
   })
 }
@@ -63,6 +64,19 @@ export function useRejectApplication() {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
+export function useWithdrawApplication() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ applicationId, taskId: _taskId }: { applicationId: string; taskId: string }) => {
+      await api.post(`/applications/${applicationId}/withdraw`)
+    },
+    onSuccess: (_d, vars) => {
+      void qc.invalidateQueries({ queryKey: ['applications', vars.taskId] })
+      void qc.invalidateQueries({ queryKey: ['my-application', vars.taskId] })
     },
   })
 }

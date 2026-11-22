@@ -7,9 +7,19 @@ async function main() {
   await pool.query('select 1')
 
   const app = createApp()
-  app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, () => {
     console.log(`CampusGigs API listening on http://localhost:${env.PORT}`)
   })
+
+  const shutdown = () => {
+    server.close(async () => {
+      await pool.end()
+      process.exit(0)
+    })
+  }
+
+  process.on('SIGTERM', shutdown)
+  process.on('SIGINT', shutdown)
 }
 
 main().catch((err) => {

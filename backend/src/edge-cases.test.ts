@@ -1,8 +1,33 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
+import { pool } from './config/db.js'
 
 const app = createApp()
+
+let dbAvailable = false
+
+beforeAll(async () => {
+  try {
+    const probe = await pool.query('SELECT 1')
+    dbAvailable = !!probe
+  } catch {
+    dbAvailable = false
+    console.warn(
+      '\n[Diagnostic] Live database is currently unavailable (Supabase project may be paused or offline).\nSkipping live database integration tests. Offline security and schema tests continue running.\n',
+    )
+  }
+})
+
+function liveTest(name: string, fn: () => Promise<void>) {
+  it(name, async (ctx) => {
+    if (!dbAvailable) {
+      ctx.skip()
+      return
+    }
+    await fn()
+  })
+}
 
 function uniqEmail(tag: string) {
   return `edge.${tag}.${Date.now()}.${Math.floor(Math.random() * 1e6)}@thapar.edu`
@@ -31,7 +56,7 @@ describe('health & catalog', () => {
     expect(res.body.data.status).toBe('ok')
   })
 
-  it('lists departments and categories', async () => {
+  liveTest('lists departments and categories', async () => {
     const depts = await request(app).get('/api/v1/catalog/departments')
     const cats = await request(app).get('/api/v1/catalog/categories')
     expect(depts.status).toBe(200)
@@ -87,7 +112,7 @@ describe('auth edge cases', () => {
     expect(res.status).toBeGreaterThanOrEqual(400)
   })
 
-  it('signs up with bonus wallet and returns profile', async () => {
+  liveTest('signs up with bonus wallet and returns profile', async () => {
     const { res } = await signup()
     expect(res.status).toBe(201)
     expect(res.body.data.accessToken).toBeTruthy()
@@ -95,7 +120,7 @@ describe('auth edge cases', () => {
     expect(Number(res.body.data.profile.wallet_balance)).toBe(100)
   })
 
-  it('rejects duplicate email', async () => {
+  liveTest('rejects duplicate email', async () => {
     const email = uniqEmail('dup')
     const first = await signup({ email })
     expect(first.res.status).toBe(201)
@@ -104,7 +129,7 @@ describe('auth edge cases', () => {
     expect(second.res.body.error.code).toBe('EMAIL_TAKEN')
   })
 
-  it('logs in with correct credentials', async () => {
+  liveTest('logs in with correct credentials', async () => {
     const email = uniqEmail('login')
     await signup({ email, password: 'password123' })
     const res = await request(app)
@@ -114,7 +139,7 @@ describe('auth edge cases', () => {
     expect(res.body.data.accessToken).toBeTruthy()
   })
 
-  it('rejects wrong password', async () => {
+  liveTest('rejects wrong password', async () => {
     const email = uniqEmail('badpw')
     await signup({ email })
     const res = await request(app)
@@ -124,7 +149,7 @@ describe('auth edge cases', () => {
     expect(res.body.error.code).toBe('INVALID_CREDENTIALS')
   })
 
-  it('rejects unknown login email', async () => {
+  liveTest('rejects unknown login email', async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: uniqEmail('ghost'), password: 'password123' })
@@ -143,7 +168,7 @@ describe('auth edge cases', () => {
     expect(res.status).toBe(401)
   })
 
-  it('returns me for valid token', async () => {
+  liveTest('returns me for valid token', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const me = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`)
@@ -156,7 +181,7 @@ describe('auth edge cases', () => {
     expect(res.status).toBe(401)
   })
 
-  it('refresh rotates access token from cookie', async () => {
+  liveTest('refresh rotates access token from cookie', async () => {
     const agent = request.agent(app)
     const email = uniqEmail('refresh')
     await agent.post('/api/v1/auth/signup').send({
@@ -171,7 +196,7 @@ describe('auth edge cases', () => {
     expect(refreshed.body.data.accessToken).toBeTruthy()
   })
 
-  it('logout requires auth and clears session', async () => {
+  liveTest('logout requires auth and clears session', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const out = await request(app)
@@ -182,14 +207,14 @@ describe('auth edge cases', () => {
 })
 
 describe('tasks browse & filters', () => {
-  it('returns open listings', async () => {
+  liveTest('returns open listings', async () => {
     const res = await request(app).get('/api/v1/tasks?limit=5')
     expect(res.status).toBe(200)
     expect(Array.isArray(res.body.data)).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
   })
 
-  it('filters by listing_type', async () => {
+  liveTest('filters by listing_type', async () => {
     const res = await request(app).get('/api/v1/tasks?listing_type=gig&limit=20')
     expect(res.status).toBe(200)
     for (const t of res.body.data) {
@@ -197,32 +222,32 @@ describe('tasks browse & filters', () => {
     }
   })
 
-  it('filters by search query', async () => {
+  liveTest('filters by search query', async () => {
     const res = await request(app).get('/api/v1/tasks?q=React&limit=20')
     expect(res.status).toBe(200)
     expect(res.body.data.length).toBeGreaterThan(0)
     expect(String(res.body.data[0].title).toLowerCase()).toContain('react')
   })
 
-  it('supports sort options', async () => {
+  liveTest('supports sort options', async () => {
     for (const sort of ['newest', 'deadline', 'budget_high', 'rating']) {
       const res = await request(app).get(`/api/v1/tasks?sort=${sort}&limit=3`)
       expect(res.status).toBe(200)
     }
   })
 
-  it('clamps limit to max 50', async () => {
+  liveTest('clamps limit to max 50', async () => {
     const res = await request(app).get('/api/v1/tasks?limit=999')
     expect(res.status).toBe(200)
     expect(res.body.data.length).toBeLessThanOrEqual(50)
   })
 
-  it('404s unknown task id', async () => {
+  liveTest('404s unknown task id', async () => {
     const res = await request(app).get('/api/v1/tasks/00000000-0000-4000-8000-000000000099')
     expect(res.status).toBe(404)
   })
 
-  it('returns a real task by id', async () => {
+  liveTest('returns a real task by id', async () => {
     const list = await request(app).get('/api/v1/tasks?limit=1')
     const id = list.body.data[0].id as string
     const one = await request(app).get(`/api/v1/tasks/${id}`)
@@ -242,7 +267,7 @@ describe('tasks browse & filters', () => {
     expect(res.status).toBe(401)
   })
 
-  it('rejects short title/description on create', async () => {
+  liveTest('rejects short title/description on create', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const cats = await request(app).get('/api/v1/catalog/categories')
@@ -260,7 +285,7 @@ describe('tasks browse & filters', () => {
     expect(res.status).toBeGreaterThanOrEqual(400)
   })
 
-  it('creates a gig listing when authenticated', async () => {
+  liveTest('creates a gig listing when authenticated', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const cats = await request(app).get('/api/v1/catalog/categories')
@@ -282,7 +307,7 @@ describe('tasks browse & filters', () => {
     expect(Number(res.body.data.budget)).toBe(15)
   })
 
-  it('blocks workshop create for ug_student', async () => {
+  liveTest('blocks workshop create for ug_student', async () => {
     const { res: signupRes } = await signup({ campus_role: 'ug_student' })
     const token = signupRes.body.data.accessToken as string
     const cats = await request(app).get('/api/v1/catalog/categories')
@@ -302,7 +327,7 @@ describe('tasks browse & filters', () => {
     expect(res.body.error.code).toBe('FORBIDDEN')
   })
 
-  it('allows workshop create for faculty', async () => {
+  liveTest('allows workshop create for faculty', async () => {
     const { res: signupRes } = await signup({
       campus_role: 'faculty',
       designation: 'Assistant Professor',
@@ -335,13 +360,11 @@ describe('tasks browse & filters', () => {
 
 describe('applications & wallet edge cases', () => {
   it('requires auth to apply', async () => {
-    const list = await request(app).get('/api/v1/tasks?limit=1')
-    const taskId = list.body.data[0].id as string
-    const res = await request(app).post('/api/v1/applications').send({ task_id: taskId })
+    const res = await request(app).post('/api/v1/applications').send({ task_id: '00000000-0000-4000-8000-000000000001' })
     expect(res.status).toBe(401)
   })
 
-  it('rejects apply to own listing', async () => {
+  liveTest('rejects apply to own listing', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const cats = await request(app).get('/api/v1/catalog/categories')
@@ -365,7 +388,7 @@ describe('applications & wallet edge cases', () => {
     expect(apply.body.error.code).toBe('INVALID')
   })
 
-  it('applies once then rejects duplicate application', async () => {
+  liveTest('applies once then rejects duplicate application', async () => {
     const poster = await signup({ full_name: 'Poster Edge' })
     const worker = await signup({ full_name: 'Worker Edge' })
     const posterToken = poster.res.body.data.accessToken as string
@@ -397,7 +420,7 @@ describe('applications & wallet edge cases', () => {
     expect(second.body.error.code).toBe('EXISTS')
   })
 
-  it('rejects apply to unknown task', async () => {
+  liveTest('rejects apply to unknown task', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const res = await request(app)
@@ -412,7 +435,7 @@ describe('applications & wallet edge cases', () => {
     expect(res.status).toBe(401)
   })
 
-  it('wallet/me returns signup balance', async () => {
+  liveTest('wallet/me returns signup balance', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const wallet = await request(app)
@@ -423,7 +446,7 @@ describe('applications & wallet edge cases', () => {
     expect(Array.isArray(wallet.body.data.transactions)).toBe(true)
   })
 
-  it('accept holds escrow and lowers poster balance', async () => {
+  liveTest('accept holds escrow and lowers poster balance', async () => {
     const poster = await signup({ full_name: 'Escrow Poster' })
     const worker = await signup({ full_name: 'Escrow Worker' })
     const posterToken = poster.res.body.data.accessToken as string
@@ -458,7 +481,7 @@ describe('applications & wallet edge cases', () => {
 })
 
 describe('admin & notifications auth edges', () => {
-  it('blocks admin routes for normal users', async () => {
+  liveTest('blocks admin routes for normal users', async () => {
     const { res: signupRes } = await signup()
     const token = signupRes.body.data.accessToken as string
     const res = await request(app)
@@ -482,5 +505,64 @@ describe('admin & notifications auth edges', () => {
       '/api/v1/messages/task/00000000-0000-4000-8000-000000000001',
     )
     expect(res.status).toBe(401)
+  })
+
+  liveTest('allows applicant to withdraw pending application and reapply', async () => {
+    const poster = await signup({ full_name: 'Poster Withdraw Test' })
+    const worker = await signup({ full_name: 'Worker Withdraw Test' })
+    const posterToken = poster.res.body.data.accessToken as string
+    const workerToken = worker.res.body.data.accessToken as string
+    const cats = await request(app).get('/api/v1/catalog/categories')
+    const created = await request(app)
+      .post('/api/v1/tasks')
+      .set('Authorization', `Bearer ${posterToken}`)
+      .send({
+        title: 'Application withdraw test task',
+        description: 'Listing to test applicant withdrawal lifecycle safely.',
+        category_id: cats.body.data[0].id,
+        difficulty: 'beginner',
+        listing_type: 'gig',
+        budget: 10,
+      })
+    const taskId = created.body.data.id as string
+    const apply = await request(app)
+      .post('/api/v1/applications')
+      .set('Authorization', `Bearer ${workerToken}`)
+      .send({ task_id: taskId, message: 'First attempt' })
+    expect(apply.status).toBe(201)
+    const appId = apply.body.data.id as string
+
+    // Withdraw application
+    const withdraw = await request(app)
+      .post(`/api/v1/applications/${appId}/withdraw`)
+      .set('Authorization', `Bearer ${workerToken}`)
+    expect(withdraw.status).toBe(200)
+
+    // Reapplying is now permitted
+    const reapply = await request(app)
+      .post('/api/v1/applications')
+      .set('Authorization', `Bearer ${workerToken}`)
+      .send({ task_id: taskId, message: 'Second attempt' })
+    expect(reapply.status).toBe(201)
+  })
+
+  liveTest('blocks token refresh if user profile is suspended', async () => {
+    const { res: signupRes, email } = await signup({ full_name: 'Suspended Refresh Target' })
+    const rawCookies = signupRes.headers['set-cookie']
+    expect(rawCookies).toBeDefined()
+    const cookies = Array.isArray(rawCookies) ? rawCookies : [String(rawCookies)]
+    const refreshCookie = cookies.find((c) => c.startsWith('refreshToken='))
+    expect(refreshCookie).toBeTruthy()
+
+    // Suspend user directly in DB
+    const { pool } = await import('./config/db.js')
+    await pool.query(`update profiles set is_suspended = true where college_email = $1`, [email])
+
+    // Attempt token refresh
+    const res = await request(app)
+      .post('/api/v1/auth/refresh')
+      .set('Cookie', [refreshCookie!])
+    expect(res.status).toBe(403)
+    expect(res.body.error.code).toBe('SUSPENDED')
   })
 })

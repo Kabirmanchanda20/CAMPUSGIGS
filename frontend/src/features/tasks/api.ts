@@ -99,6 +99,7 @@ export function useCompleteTask() {
       void qc.invalidateQueries({ queryKey: ['task', taskId] })
       void qc.invalidateQueries({ queryKey: ['my-tasks'] })
       void qc.invalidateQueries({ queryKey: ['recommendations'] })
+      void qc.invalidateQueries({ queryKey: ['wallet'] })
     },
   })
 }
@@ -113,6 +114,7 @@ export function useCancelTask() {
       void qc.invalidateQueries({ queryKey: ['task', vars.taskId] })
       void qc.invalidateQueries({ queryKey: ['my-tasks'] })
       void qc.invalidateQueries({ queryKey: ['tasks'] })
+      void qc.invalidateQueries({ queryKey: ['wallet'] })
     },
   })
 }
