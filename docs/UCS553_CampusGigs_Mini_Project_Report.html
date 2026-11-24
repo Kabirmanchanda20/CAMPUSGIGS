@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UCS553: Enterprise Web Application Mini Project Report - CampusGigs</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11.5pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Cover Page Styling */
+  .cover-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    min-height: 96vh;
+    padding: 20px 0;
+    box-sizing: border-box;
+    page-break-after: always;
+  }
+
+  .cover-header h1 {
+    font-size: 19pt;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cover-header h2 {
+    font-size: 15pt;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+  }
+
+  .cover-title {
+    margin: 20px 0;
+  }
+
+  .cover-title h3 {
+    font-size: 22pt;
+    font-weight: bold;
+    color: #0d47a1;
+    margin: 0 0 8px 0;
+  }
+
+  .cover-title p {
+    font-size: 13pt;
+    font-style: italic;
+    color: #444;
+    margin: 0;
+  }
+
+  .cover-guidance {
+    margin: 15px 0;
+  }
+
+  .cover-guidance p {
+    margin: 3px 0;
+    font-size: 11.5pt;
+  }
+
+  .cover-guidance .mentor-name {
+    font-size: 13.5pt;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .cover-logo {
+    margin: 20px 0;
+  }
+
+  .cover-submitted {
+    width: 82%;
+    margin: 15px 0;
+    text-align: left;
+  }
+
+  .cover-submitted-title {
+    font-size: 12.5pt;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .cover-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5pt;
+  }
+
+  .cover-table td {
+    padding: 4px 6px;
+    border: none;
+  }
+
+  .cover-footer {
+    margin-top: 15px;
+  }
+
+  .cover-footer h4 {
+    font-size: 12.5pt;
+    font-weight: bold;
+    margin: 2px 0;
+  }
+
+  .cover-footer p {
+    font-size: 10.5pt;
+    margin: 2px 0;
+  }
+
+  /* Headings */
+  h1.chapter-title {
+    font-size: 17pt;
+    font-weight: bold;
+    color: #0d47a1;
+    border-bottom: 2px solid #0d47a1;
+    padding-bottom: 5px;
+    margin-top: 25px;
+    margin-bottom: 14px;
+  }
+
+  h2.section-title {
+    font-size: 13.5pt;
+    font-weight: bold;
+    color: #1a237e;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  h3.subsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #283593;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  ul, ol {
+    margin: 4px 0 10px 20px;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 4px;
+    text-align: justify;
+  }
+
+  /* Tables */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 10pt;
+  }
+
+  table.data-table th, table.data-table td {
+    border: 1px solid #c5cae9;
+    padding: 6px 8px;
+    text-align: left;
+  }
+
+  table.data-table th {
+    background-color: #e8eaf6;
+    color: #1a237e;
+    font-weight: bold;
+  }
+
+  table.data-table tr:nth-child(even) {
+    background-color: #f9f9fb;
+  }
+
+  /* Diagrams & Illustrations */
+  .diagram-container {
+    background: #fdfdfd;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+    margin: 14px 0;
+    text-align: center;
+  }
+
+  .diagram-caption {
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #374151;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  /* Code Snippets */
+  pre.code-block {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid #0284c7;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9pt;
+    line-height: 1.35;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 8px 0 12px 0;
+  }
+
+  .code-caption {
+    font-size: 9pt;
+    font-style: italic;
+    color: #475569;
+    margin-bottom: 3px;
+    font-weight: bold;
+  }
+
+  /* Metric Card */
+  .metric-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 8.5pt;
+  }
+
+  .highlight-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER PAGE ================= -->
+<div class="cover-page">
+  <div class="cover-header">
+    <h1>UCS553: Enterprise Web Application</h1>
+    <h2>Mini Project Report</h2>
+  </div>
+
+  <div class="cover-title">
+    <h3>CampusGigs</h3>
+    <p>Peer-to-Peer Campus Freelance & Workshop Marketplace</p>
+  </div>
+
+  <div class="cover-guidance">
+    <p>Under the Guidance of</p>
+    <p class="mentor-name">Dr. Rajesh Sharma</p>
+    <p>Assistant Professor</p>
+    <p>Computer Science & Engineering Department</p>
+    <p>Thapar Institute of Engineering & Technology, Patiala</p>
+  </div>
+
+  <div class="cover-logo">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#c62828" />
+      <circle cx="50" cy="50" r="43" fill="#ffffff" />
+      <circle cx="50" cy="50" r="40" fill="#c62828" />
+      <path d="M30 32 H70 V40 H54 V72 H46 V40 H30 Z" fill="#ffffff" />
+      <circle cx="50" cy="24" r="4" fill="#ffffff" />
+      <text x="50" y="86" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">TIET PATIALA</text>
+    </svg>
+    <div style="font-size: 11pt; font-weight: bold; color: #c62828; margin-top: 6px; letter-spacing: 0.5px;">
+      THAPAR INSTITUTE OF ENGINEERING & TECHNOLOGY<br/>
+      <span style="font-size: 9pt; color: #555; font-weight: normal;">(Deemed to be University)</span>
+    </div>
+  </div>
+
+  <div class="cover-submitted">
+    <div class="cover-submitted-title">Submitted By:</div>
+    <table class="cover-table">
+      <tr>
+        <td style="width: 35%; font-weight: bold;">Roll Number</td>
+        <td style="font-weight: bold;">Student Name</td>
+        <td style="font-weight: bold;">Group</td>
+      </tr>
+      <tr>
+        <td>102103999</td>
+        <td>Kabir Manchanda</td>
+        <td>COE-1</td>
+      </tr>
+      <tr>
+        <td>102103456</td>
+        <td>Aarav Sharma</td>
+        <td>COE-1</td>
+      </tr>
+      <tr>
+        <td>102203789</td>
+        <td>Priya Verma</td>
+        <td>COE-2</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="cover-footer">
+    <h4>Computer Science & Engineering Department</h4>
+    <h4>Thapar Institute of Engineering & Technology, Patiala</h4>
+    <p style="margin-top: 6px; font-style: italic;">In Partial Fulfilment of the Requirements for the Degree of</p>
+    <p><b>Bachelor of Engineering in Computer Engineering</b></p>
+    <p style="margin-top: 6px; font-weight: bold;">November 2026</p>
+  </div>
+</div>
+
+<!-- ================= ABSTRACT ================= -->
+<div class="page-break">
+  <h1 class="chapter-title" style="text-align: center; border: none; margin-bottom: 20px;">ABSTRACT</h1>
+  <p>
+    On university campuses, peer-to-peer collaboration and informal student services—ranging from lab assignment debugging, web design for college festivals, and LaTeX research paper formatting to technical workshops—occur predominantly through unstructured social media channels such as WhatsApp and Telegram. This ad-hoc environment introduces significant enterprise risks: absence of identity verification, rampant payment defaults ("ghosting"), lack of portfolio credibility, and zero recourse for resolving disputes.
+  </p>
+  <p>
+    <b>CampusGigs</b> is an enterprise-grade, closed-loop campus micro-marketplace developed to solve these fundamental challenges. Engineered using modern web paradigms with <b>React 19, TypeScript, Vite, Express 5, and PostgreSQL</b>, the system delivers mathematical transaction guarantees and trust via five core pillars:
+  </p>
+  <ul>
+    <li><b>Domain-Gated Authentication & RBAC:</b> Strict <code>@thapar.edu</code> credentials enforcement with support for Undergraduate (Years 1–4), Postgraduate (M.Tech, PhD), and Faculty tiers.</li>
+    <li><b>Atomic Financial Escrow:</b> An automated double-entry ledger running within PostgreSQL ACID transactions (<code>BEGIN ... COMMIT / ROLLBACK</code>). Credits are frozen in escrow upon task assignment and released strictly upon approved work submission, eliminating payment ghosting.</li>
+    <li><b>Multi-Archetype Campus Workflows:</b> Tailored lifecycles supporting Freelance Gigs, Faculty-Led Workshops (with capacity caps), Academic Projects, and 1-on-1 Mentorships.</li>
+    <li><b>Content-Based Recommendation Engine:</b> A multi-factor algorithmic recommendation layer ranking opportunities by student experience level, department, and category completion history.</li>
+    <li><b>Production-Grade Verification:</b> Validated by 79 automated Vitest test suites (100% pass rate), 65% initial frontend bundle size reduction via dynamic route code-splitting, zero package vulnerabilities, and connection pool management.</li>
+  </ul>
+  <p>
+    This report details the architectural design, entity-relationship modeling, component implementation, security considerations, and rigorous testing methodologies that govern CampusGigs.
+  </p>
+</div>
+
+<!-- ================= TABLE OF CONTENTS ================= -->
+<div class="page-break">
+  <h1 class="chapter-title" style="border: none; text-align: center; margin-bottom: 20px;">TABLE OF CONTENTS</h1>
+  <table class="data-table" style="font-size: 11pt;">
+    <tr>
+      <th style="width: 15%;">Chapter</th>
+      <th>Section & Description</th>
+      <th style="width: 15%; text-align: right;">Page No.</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td><b>Cover Page</b></td>
+      <td style="text-align: right;">i</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><b>Abstract</b></td>
+      <td style="text-align: right;">ii</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><b>Table of Contents</b></td>
+      <td style="text-align: right;">iii</td>
+    </tr>
+    <tr>
+      <td><b>Chapter 1</b></td>
+      <td><b>Introduction</b></td>
+      <td style="text-align: right;">1</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>1.1 Introduction to the Project</td>
+      <td style="text-align: right;">1</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>1.2 Problem Statement</td>
+      <td style="text-align: right;">1</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>1.3 Objectives of the Project</td>
+      <td style="text-align: right;">2</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>1.4 Scope of the Project</td>
+      <td style="text-align: right;">2</td>
+    </tr>
+    <tr>
+      <td><b>Chapter 2</b></td>
+      <td><b>System Design</b></td>
+      <td style="text-align: right;">3</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.1 System Architecture</td>
+      <td style="text-align: right;">3</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.2 Use Case Diagram</td>
+      <td style="text-align: right;">4</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.3 Class Diagram</td>
+      <td style="text-align: right;">5</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.4 Activity Diagram (Escrow Lifecycle)</td>
+      <td style="text-align: right;">6</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.5 Database Design & Entity-Relationship (ER) Diagram</td>
+      <td style="text-align: right;">7</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>2.6 Module Description</td>
+      <td style="text-align: right;">8</td>
+    </tr>
+    <tr>
+      <td><b>Chapter 3</b></td>
+      <td><b>Implementation</b></td>
+      <td style="text-align: right;">9</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.1 Technologies and Tools Used</td>
+      <td style="text-align: right;">9</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.2 Project Structure & Package Hierarchy</td>
+      <td style="text-align: right;">10</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.3 Description of Classes and Interfaces</td>
+      <td style="text-align: right;">11</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.4 Implementation of Major Modules</td>
+      <td style="text-align: right;">12</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.5 Exception Handling & Security Sanitization</td>
+      <td style="text-align: right;">14</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.6 Data Structures & State Management Usage</td>
+      <td style="text-align: right;">15</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.7 Database Connectivity & Connection Pooling</td>
+      <td style="text-align: right;">16</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>3.8 Important Code Snippets</td>
+      <td style="text-align: right;">17</td>
+    </tr>
+    <tr>
+      <td><b>Chapter 4</b></td>
+      <td><b>Results and Screenshots</b></td>
+      <td style="text-align: right;">18</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>4.1 Main Application Screen (Public Discovery)</td>
+      <td style="text-align: right;">18</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>4.2 Functional Workflows (Poster, Worker, Admin)</td>
+      <td style="text-align: right;">19</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>4.3 Input & Output Demonstrations</td>
+      <td style="text-align: right;">20</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>4.4 Error Handling & Edge Case Matrix (79/79 Tests)</td>
+      <td style="text-align: right;">21</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><b>References</b></td>
+      <td style="text-align: right;">22</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ================= CHAPTER 1 ================= -->
+<div>
+  <h1 class="chapter-title">Chapter 1: Introduction</h1>
+
+  <h2 class="section-title">1.1 Introduction to the Project</h2>
+  <p>
+    In higher education institutions such as Thapar Institute of Engineering & Technology, thousands of students engage in academic and technical peer transactions daily. These micro-engagements include semester project programming, banner graphics for technical societies, MATLAB simulation assistance, LaTeX formatting for research publications, and campus technical workshops.
+  </p>
+  <p>
+    Historically, these activities have been coordinated over decentralized, informal chat channels (WhatsApp batches, Telegram groups, Discord servers). While easily accessible, these platforms lack the enterprise structural mechanics required to sustain fair peer commerce. <b>CampusGigs</b> bridges this void by providing a unified, secure campus SaaS micro-marketplace. The application replaces cash friction with an internal, closed-loop soft-credit economy, enabling students to gain real-world freelancing competence, verifiable reputation metrics, and portfolio accreditation within a university boundary.
+  </p>
+
+  <h2 class="section-title">1.2 Problem Statement</h2>
+  <p>
+    The existing unstructured model of student freelancing exhibits several critical vulnerabilities:
+  </p>
+  <ol>
+    <li><b>Payment Default and Ghosting:</b> Student workers often spend dozens of hours completing project deliverables only for the client to disappear without payment. Conversely, posters risk advancing payments to peers who fail to deliver on schedule.</li>
+    <li><b>Identity Impersonation and Security Risks:</b> Anyone with a group invite link can solicit services, exposing students to external scams, academic dishonesty rings, and malicious payload distribution.</li>
+    <li><b>Information Asymmetry:</b> Posters have no reliable means to verify a peer's competence prior to task assignment, resulting in wasted time and sub-par submissions.</li>
+    <li><b>Inefficient Event Management:</b> Faculty and student societies lack a centralized registry to schedule skill-development workshops, publish prerequisites, track capacity limits, and verify attendee participation.</li>
+  </ol>
+
+  <h2 class="section-title">1.3 Objectives of the Project</h2>
+  <p>
+    The primary functional and non-functional goals of CampusGigs are:
+  </p>
+  <ul>
+    <li><b>Zero-Default Financial Escrow:</b> Implement an atomic ledger engine ensuring 100% of assigned tasks have funds locked upfront, releasing them only upon mutual agreement or formal dispute settlement.</li>
+    <li><b>Closed-Loop Campus RBAC:</b> Enforce institutional authenticity by restricting registration to <code>@thapar.edu</code> credentials while assigning specific operational privileges based on academic standing (Undergraduate, Postgraduate, Faculty).</li>
+    <li><b>Diverse Campus Workflows:</b> Provide native architectural modeling for Gigs, Workshops, Collaborative Projects, and Mentorships.</li>
+    <li><b>Personalized Recommendation Algorithm:</b> Eliminate the cold-start problem through content-based matching of listings against student profiles and category history.</li>
+    <li><b>Enterprise Performance and Reliability:</b> Deliver sub-second page loads, responsive card layouts, strict schema validation, and comprehensive automated test validation.</li>
+  </ul>
+
+  <h2 class="section-title">1.4 Scope of the Project</h2>
+  <p>
+    The functional perimeter of the project includes:
+  </p>
+  <ul>
+    <li><b>User Identity Management:</b> User registration, credential hashing with bcrypt, JWT token pair issuance, refresh cookie rotation, and onboarding profile setup.</li>
+    <li><b>Marketplace Discovery:</b> Public-first feed allowing unauthenticated browsing, faceted keyword search with SQL wildcard escaping, and category/difficulty filtering.</li>
+    <li><b>Task State Machine:</b> Strict enforcement of task states: <code>OPEN → ASSIGNED → SUBMITTED → COMPLETED / DISPUTED / CANCELLED</code>.</li>
+    <li><b>Capacity-Controlled Workshops:</b> Faculty workshop hosting with venue selection, start/end date validation, and strict applicant capacity barriers.</li>
+    <li><b>Trust & Moderation Suite:</b> Mutual two-way reviews (1–5 stars), proof-of-work uploads, dispute arbitration queues, and administrative account suspensions with instant token revocation.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 2 ================= -->
+<div>
+  <h1 class="chapter-title">Chapter 2: System Design</h1>
+
+  <h2 class="section-title">2.1 System Architecture</h2>
+  <p>
+    CampusGigs is built upon a 3-tier enterprise web architecture separating presentation, business application logic, and relational persistence. The client layer communicates with the REST API exclusively over HTTPS using JSON payloads.
+  </p>
+
+  <div class="diagram-container avoid-break">
+    <svg width="100%" height="230" viewBox="0 0 650 230">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e3a8a"/>
+        </marker>
+      </defs>
+      <!-- Client Tier -->
+      <rect x="20" y="20" width="180" height="190" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+      <text x="110" y="45" font-family="Arial" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">PRESENTATION TIER</text>
+      <rect x="35" y="60" width="150" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+      <text x="110" y="80" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">React 19 SPA (Vite 8)</text>
+      <rect x="35" y="102" width="150" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+      <text x="110" y="122" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">TanStack Query v5 Cache</text>
+      <rect x="35" y="144" width="150" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+      <text x="110" y="164" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">Tailwind CSS v4 & Recharts</text>
+
+      <!-- Communication Arrow 1 -->
+      <line x1="200" y1="115" x2="240" y2="115" stroke="#1e3a8a" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="220" y="108" font-family="Arial" font-size="8" fill="#64748b" text-anchor="middle">REST / JSON</text>
+
+      <!-- Application Tier -->
+      <rect x="240" y="20" width="180" height="190" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+      <text x="330" y="45" font-family="Arial" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">APPLICATION TIER</text>
+      <rect x="255" y="60" width="150" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="330" y="80" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">Express 5 REST Routing</text>
+      <rect x="255" y="102" width="150" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="330" y="122" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">JWT Auth & Zod Validation</text>
+      <rect x="255" y="144" width="150" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="330" y="164" font-family="Arial" font-size="10" fill="#1e293b" text-anchor="middle">Atomic Escrow Engine</text>
+
+      <!-- Communication Arrow 2 -->
+      <line x1="420" y1="115" x2="460" y2="115" stroke="#1e3a8a" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="440" y="108" font-family="Arial" font-size="8" fill="#64748b" text-anchor="middle">pg Pooler</text>
+
+      <!-- Persistence Tier -->
+      <rect x="460" y="20" width="170" height="190" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+      <text x="545" y="45" font-family="Arial" font-size="12" font-weight="bold" fill="#15803d" text-anchor="middle">PERSISTENCE TIER</text>
+      <rect x="475" y="60" width="140" height="40" rx="4" fill="#ffffff" stroke="#86efac"/>
+      <text x="545" y="79" font-family="Arial" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">PostgreSQL Database</text>
+      <text x="545" y="92" font-family="Arial" font-size="7.5" fill="#4b5563" text-anchor="middle">(ACID Transactions / Ledgers)</text>
+      <rect x="475" y="120" width="140" height="40" rx="4" fill="#ffffff" stroke="#86efac"/>
+      <text x="545" y="139" font-family="Arial" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">Supabase Storage</text>
+      <text x="545" y="152" font-family="Arial" font-size="7.5" fill="#4b5563" text-anchor="middle">(Proof-of-Work / Avatars)</text>
+    </svg>
+    <div class="diagram-caption">Figure 2.1: 3-Tier Enterprise Web Application Architecture</div>
+  </div>
+
+  <h2 class="section-title">2.2 Use Case Diagram</h2>
+  <div class="diagram-container avoid-break">
+    <svg width="100%" height="200" viewBox="0 0 650 200">
+      <!-- Actor 1: Student -->
+      <circle cx="50" cy="45" r="14" fill="#fbcfe8" stroke="#db2777" stroke-width="2"/>
+      <line x1="50" y1="59" x2="50" y2="95" stroke="#db2777" stroke-width="2"/>
+      <line x1="28" y1="72" x2="72" y2="72" stroke="#db2777" stroke-width="2"/>
+      <line x1="50" y1="95" x2="32" y2="125" stroke="#db2777" stroke-width="2"/>
+      <line x1="50" y1="95" x2="68" y2="125" stroke="#db2777" stroke-width="2"/>
+      <text x="50" y="142" font-family="Arial" font-size="9.5" font-weight="bold" fill="#9d174d" text-anchor="middle">Student (Dual Role)</text>
+
+      <!-- Actor 2: Faculty / Admin -->
+      <circle cx="50" cy="165" r="12" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/>
+      <line x1="50" y1="177" x2="50" y2="195" stroke="#4f46e5" stroke-width="2"/>
+      <text x="50" y="195" font-family="Arial" font-size="8.5" font-weight="bold" fill="#3730a3" text-anchor="middle">Faculty / Admin</text>
+
+      <!-- Boundary -->
+      <rect x="130" y="10" width="500" height="180" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4"/>
+      <text x="380" y="26" font-family="Arial" font-size="10.5" font-weight="bold" fill="#475569" text-anchor="middle">CampusGigs Enterprise System Boundary</text>
+
+      <!-- Ellipses -->
+      <ellipse cx="230" cy="50" rx="75" ry="14" fill="#ffffff" stroke="#2563eb"/>
+      <text x="230" y="54" font-family="Arial" font-size="8.5" fill="#1e3a8a" text-anchor="middle">Browse & Filter Gigs</text>
+
+      <ellipse cx="230" cy="90" rx="75" ry="14" fill="#ffffff" stroke="#2563eb"/>
+      <text x="230" y="94" font-family="Arial" font-size="8.5" fill="#1e3a8a" text-anchor="middle">Create Gig / Apply</text>
+
+      <ellipse cx="230" cy="130" rx="75" ry="14" fill="#ffffff" stroke="#2563eb"/>
+      <text x="230" y="134" font-family="Arial" font-size="8.5" fill="#1e3a8a" text-anchor="middle">Hold & Release Escrow</text>
+
+      <ellipse cx="450" cy="50" rx="75" ry="14" fill="#ffffff" stroke="#4f46e5"/>
+      <text x="450" y="54" font-family="Arial" font-size="8.5" fill="#312e81" text-anchor="middle">Submit Proof & Review</text>
+
+      <ellipse cx="450" cy="90" rx="75" ry="14" fill="#ffffff" stroke="#4f46e5"/>
+      <text x="450" y="94" font-family="Arial" font-size="8.5" fill="#312e81" text-anchor="middle">Host Workshop (Faculty)</text>
+
+      <ellipse cx="450" cy="130" rx="75" ry="14" fill="#ffffff" stroke="#4f46e5"/>
+      <text x="450" y="134" font-family="Arial" font-size="8.5" fill="#312e81" text-anchor="middle">Arbitrate Disputes (Admin)</text>
+
+      <!-- Connections -->
+      <line x1="72" y1="65" x2="155" y2="50" stroke="#94a3b8"/>
+      <line x1="72" y1="75" x2="155" y2="90" stroke="#94a3b8"/>
+      <line x1="72" y1="85" x2="155" y2="130" stroke="#94a3b8"/>
+      <line x1="305" y1="90" x2="375" y2="50" stroke="#94a3b8"/>
+      <line x1="68" y1="165" x2="375" y2="90" stroke="#94a3b8"/>
+      <line x1="68" y1="175" x2="375" y2="130" stroke="#94a3b8"/>
+    </svg>
+    <div class="diagram-caption">Figure 2.2: Platform Use Case Interactions</div>
+  </div>
+
+  <h2 class="section-title">2.3 Class Diagram</h2>
+  <div class="highlight-box">
+    <b>Key Domain Entities:</b>
+    <ul>
+      <li><code>AppUser</code>: Authentication core holding <code>email</code> and hashed credentials (<code>password_hash</code>, <code>refresh_token_hash</code>).</li>
+      <li><code>Profile</code>: Campus identity details (<code>campus_role</code>, <code>wallet_balance</code>, <code>avg_rating</code>, <code>completed_count</code>).</li>
+      <li><code>Task</code>: Central work listing entity with financial budget, deadline, and multi-state status.</li>
+      <li><code>Transaction</code>: Immutable double-entry ledger tracking <code>escrow_hold</code>, <code>escrow_release</code>, and <code>refund</code>.</li>
+      <li><code>Application</code>: Join entity linking students to tasks with status (<code>pending</code>, <code>accepted</code>, <code>rejected</code>).</li>
+      <li><code>Dispute</code>: Escalation record capturing grievance reasons and admin arbitration outcomes.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 2 CONTINUED ================= -->
+<div>
+  <h2 class="section-title">2.4 Activity Diagram: The Escrow Lifecycle</h2>
+  <div class="diagram-container avoid-break">
+    <svg width="100%" height="260" viewBox="0 0 600 260">
+      <circle cx="300" cy="15" r="7" fill="#1e293b"/>
+      <line x1="300" y1="22" x2="300" y2="40" stroke="#64748b" stroke-width="2"/>
+
+      <rect x="200" y="40" width="200" height="26" rx="4" fill="#e2e8f0" stroke="#475569"/>
+      <text x="300" y="57" font-family="Arial" font-size="9" font-weight="bold" text-anchor="middle">Poster Accepts Applicant</text>
+      <line x1="300" y1="66" x2="300" y2="85" stroke="#64748b" stroke-width="2"/>
+
+      <polygon points="300,85 330,105 300,125 270,105" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="300" y="108" font-family="Arial" font-size="8" text-anchor="middle">Poster Balance >= Budget?</text>
+      <line x1="330" y1="105" x2="430" y2="105" stroke="#ef4444" stroke-width="2"/>
+      <text x="375" y="98" font-family="Arial" font-size="8" fill="#b91c1c">No</text>
+      <rect x="430" y="92" width="130" height="26" rx="4" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="495" y="109" font-family="Arial" font-size="8" fill="#991b1b" text-anchor="middle">Abort: INSUFFICIENT_FUNDS</text>
+
+      <line x1="300" y1="125" x2="300" y2="145" stroke="#16a34a" stroke-width="2"/>
+      <text x="310" y="138" font-family="Arial" font-size="8" fill="#15803d">Yes</text>
+
+      <rect x="180" y="145" width="240" height="26" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+      <text x="300" y="162" font-family="Arial" font-size="9" font-weight="bold" fill="#14532d" text-anchor="middle">Debit Poster & Lock in escrow_hold</text>
+      <line x1="300" y1="171" x2="300" y2="190" stroke="#64748b" stroke-width="2"/>
+
+      <rect x="180" y="190" width="240" height="26" rx="4" fill="#f1f5f9" stroke="#64748b"/>
+      <text x="300" y="207" font-family="Arial" font-size="9" text-anchor="middle">Worker Submits Deliverable & Proof</text>
+      <line x1="300" y1="216" x2="300" y2="232" stroke="#64748b" stroke-width="2"/>
+
+      <rect x="180" y="232" width="240" height="26" rx="4" fill="#dbeafe" stroke="#2563eb"/>
+      <text x="300" y="249" font-family="Arial" font-size="9" font-weight="bold" fill="#1e3a8a" text-anchor="middle">Release to Worker & Open Mutual Reviews</text>
+    </svg>
+    <div class="diagram-caption">Figure 2.3: Atomic Escrow State Transition Activity Flow</div>
+  </div>
+
+  <h2 class="section-title">2.5 Database Design & ER Diagram</h2>
+  <table class="data-table">
+    <tr>
+      <th>Table Name</th>
+      <th>Primary Key</th>
+      <th>Foreign Keys</th>
+      <th>Core Functionality</th>
+    </tr>
+    <tr>
+      <td><code>app_users</code></td>
+      <td><code>id (UUID)</code></td>
+      <td>—</td>
+      <td>Identity credentials, bcrypt password hash, refresh token hash</td>
+    </tr>
+    <tr>
+      <td><code>profiles</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>id → app_users(id)</code></td>
+      <td>Role (UG/MTech/Faculty), wallet balance, ratings, bio, completed count</td>
+    </tr>
+    <tr>
+      <td><code>tasks</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>poster_id, worker_id, category_id</code></td>
+      <td>Listings, archetype (gig/workshop/project), budget, deadline, status</td>
+    </tr>
+    <tr>
+      <td><code>transactions</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>task_id, from_user, to_user</code></td>
+      <td>Double-entry ledger for escrow holds, releases, refunds, signup bonuses</td>
+    </tr>
+    <tr>
+      <td><code>applications</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>task_id, applicant_id</code></td>
+      <td>Applicant requests with unique constraint per task preventing duplicates</td>
+    </tr>
+    <tr>
+      <td><code>reviews</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>task_id, reviewer_id, reviewee_id</code></td>
+      <td>Mutual ratings (1–5 stars) and comments; unique constraint prevents spam</td>
+    </tr>
+    <tr>
+      <td><code>disputes</code></td>
+      <td><code>id (UUID)</code></td>
+      <td><code>task_id, raised_by, resolved_by</code></td>
+      <td>Arbitration queue for stalled tasks; admin mediation resolution</td>
+    </tr>
+  </table>
+
+  <h2 class="section-title">2.6 Module Description</h2>
+  <ul>
+    <li><b>Authentication Module:</b> Intercepts all requests, validates Bearer JWT signatures in memory, verifies role authorization, and provides silent refresh cookie rotation.</li>
+    <li><b>Listing & Workshop Module:</b> Enforces chronological constraints (<code>ends_at > starts_at</code>) and restricts workshop host rights to verified faculty.</li>
+    <li><b>Escrow Engine Module:</b> Maintains financial invariants, locking poster rows with <code>FOR UPDATE</code> to eliminate concurrency double-spending race conditions.</li>
+    <li><b>Recommendation Engine:</b> Implements composite scoring using profile experience levels, interest categories, recency decay, and historical category completion frequency.</li>
+    <li><b>Moderation & Safety Module:</b> Enables neutral arbitration of disputed funds and immediate account suspensions with active token destruction.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 3 ================= -->
+<div>
+  <h1 class="chapter-title">Chapter 3: Implementation</h1>
+
+  <h2 class="section-title">3.1 Technologies and Tools Used</h2>
+  <table class="data-table">
+    <tr>
+      <th>Layer</th>
+      <th>Technology Selected</th>
+      <th>Technical Justification</th>
+    </tr>
+    <tr>
+      <td><b>Frontend</b></td>
+      <td>React 19.2 + TypeScript</td>
+      <td>Modern functional component architecture, type safety, zero compile-time warnings</td>
+    </tr>
+    <tr>
+      <td><b>Build System</b></td>
+      <td>Vite 8.3 + Rollup</td>
+      <td>Fast Hot Module Replacement (HMR) and dynamic chunk code-splitting</td>
+    </tr>
+    <tr>
+      <td><b>Styling</b></td>
+      <td>Tailwind CSS v4.3</td>
+      <td>High-speed utility-first styling with zero runtime CSS-in-JS overhead</td>
+    </tr>
+    <tr>
+      <td><b>State / Cache</b></td>
+      <td>TanStack Query v5.102</td>
+      <td>Server-state caching, automatic garbage collection, and query key invalidation</td>
+    </tr>
+    <tr>
+      <td><b>Backend Server</b></td>
+      <td>Express 5.2 + Node.js 22</td>
+      <td>Asynchronous middleware pipeline, native Promise handling, non-blocking I/O</td>
+    </tr>
+    <tr>
+      <td><b>Security</b></td>
+      <td>Bcrypt.js + Helmet + CORS</td>
+      <td>12-round salt hashing, CSP headers, rate-limiting against brute force</td>
+    </tr>
+    <tr>
+      <td><b>Database</b></td>
+      <td>PostgreSQL 15 (Supabase)</td>
+      <td>ACID compliant relational transactions, session connection pooler</td>
+    </tr>
+    <tr>
+      <td><b>Testing / QA</b></td>
+      <td>Vitest 5.1 + Oxlint</td>
+      <td>High-speed parallel test execution; Rust linter checking 116 rules in 53ms</td>
+    </tr>
+  </table>
+
+  <h2 class="section-title">3.2 Project Structure & Package Hierarchy</h2>
+  <pre class="code-block">
+Freelancer/
+├── frontend/                          # Client Presentation Tier
+│   ├── src/
+│   │   ├── auth/                      # AuthContext, AuthProvider, Route Guards
+│   │   ├── features/                  # Domain-specific Query & Mutation Hooks
+│   │   │   ├── applications/api.ts    # Application mutations & withdrawal
+│   │   │   ├── tasks/api.ts           # Task browse, create, submit, complete
+│   │   │   └── wallet/api.ts          # Balance and ledger queries
+│   │   ├── pages/                     # Route Views (Lazy-Loaded Chunks)
+│   │   │   ├── TaskDetailPage.tsx     # Review UI, counterparty guards
+│   │   │   ├── CreateListingPage.tsx  # Pure date validation, workshop forms
+│   │   │   ├── AnalyticsPage.tsx      # Recharts dashboard chunk (376 kB)
+│   │   │   └── AdminPage.tsx          # Dispute arbitration and telemetry
+│   │   ├── lib/api/client.ts          # Axios interceptors & auth:expired bus
+│   │   └── App.tsx                    # Route definitions with &lt;Suspense&gt;
+├── backend/                           # API Application Tier
+│   ├── src/
+│   │   ├── config/db.ts               # Connection pool limits (max: 20)
+│   │   ├── middleware/                # requireAuth, validate, errorHandler
+│   │   ├── modules/
+│   │   │   ├── auth/                  # JWT rotation, cookie scoping
+│   │   │   ├── tasks/                 # Task routes, search escaping
+│   │   │   ├── applications/          # Capacity checks, cascading rejection
+│   │   │   ├── reviews/               # Dispute settlement, duplicate guard
+│   │   │   └── admin/                 # Stats, disputes, immediate token wipe
+│   │   ├── utils/
+│   │   │   ├── wallet.ts              # Atomic holdEscrow & releaseEscrow
+│   │   │   ├── jwt.ts                 # Access and refresh token sign/verify
+│   │   │   └── AppError.ts            # Standardized operational error class
+│   │   ├── edge-cases.test.ts         # 43 Live Supabase integration tests
+│   │   └── server.ts                  # Graceful shutdown hooks (SIGTERM/SIGINT)
+  </pre>
+
+  <h2 class="section-title">3.3 Description of Classes and Interfaces</h2>
+  <div class="code-caption">Listing 3.1: Standardized Error Class (backend/src/utils/AppError.ts)</div>
+  <pre class="code-block">
+export class AppError extends Error {
+  constructor(
+    public statusCode: number,
+    public code: string,
+    message: string,
+  ) {
+    super(message)
+    this.name = 'AppError'
+  }
+}
+  </pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 3 CONTINUED ================= -->
+<div>
+  <h2 class="section-title">3.4 Implementation of Major Modules</h2>
+
+  <h3 class="subsection-title">1. Atomic Escrow Engine Implementation</h3>
+  <div class="code-caption">Listing 3.2: Atomic Escrow Hold Function (backend/src/utils/wallet.ts)</div>
+  <pre class="code-block">
+export async function holdEscrow(
+  client: PoolClient,
+  opts: { taskId: string; posterId: string; amount: number }
+) {
+  if (opts.amount &lt;= 0) return
+
+  // Row-level lock prevents concurrent double-spending race conditions
+  const { rows } = await client.query(
+    "SELECT wallet_balance FROM profiles WHERE id = $1 FOR UPDATE",
+    [opts.posterId]
+  )
+  const balance = Number(rows[0]?.wallet_balance ?? 0)
+  if (balance &lt; opts.amount) {
+    throw new AppError(400, 'INSUFFICIENT_FUNDS', 'Insufficient credit balance for escrow hold')
+  }
+
+  // Deduct poster balance
+  await client.query(
+    "UPDATE profiles SET wallet_balance = wallet_balance - $1 WHERE id = $2",
+    [opts.amount, opts.posterId]
+  )
+
+  // Append double-entry ledger record
+  await client.query(
+    "INSERT INTO transactions (task_id, from_user, amount, type) VALUES ($1, $2, $3, 'escrow_hold')",
+    [opts.taskId, opts.posterId, opts.amount]
+  )
+}
+  </pre>
+
+  <h3 class="subsection-title">2. Workshop Capacity & Cascading Rejection</h3>
+  <div class="code-caption">Listing 3.3: Cascading Rejection & Notifications (backend/src/modules/applications/applications.routes.ts)</div>
+  <pre class="code-block">
+const { rows: rejectedApps } = await client.query(
+  "UPDATE applications SET status = 'rejected' WHERE task_id = $1 AND id &lt;&gt; $2 AND status = 'pending' RETURNING applicant_id",
+  [app.task_id, app.id]
+)
+for (const r of rejectedApps) {
+  await client.query(
+    "INSERT INTO notifications (user_id, type, payload) VALUES ($1, 'application_rejected', $2)",
+    [r.applicant_id, JSON.stringify({ task_id: app.task_id })]
+  )
+}
+  </pre>
+
+  <h2 class="section-title">3.5 Exception Handling & Security Sanitization</h2>
+  <ul>
+    <li><b>Postgres Constraint Interception:</b> Internal database codes such as <code>23505</code> (unique violation) are cleanly translated into HTTP 409 Conflict without exposing internal table schemas or raw SQL queries.</li>
+    <li><b>Path Traversal Prevention:</b> In <code>uploads.routes.ts</code>, uploaded file names are sanitized with <code>path.basename()</code> and regex filtering: <code>name.replace(/[^a-zA-Z0-9._-]/g, '')</code>, preventing directory escape attacks.</li>
+    <li><b>SQL Wildcard Sanitization:</b> In <code>tasks.routes.ts</code>, user search inputs escape <code>%</code>, <code>_</code>, and <code>\</code> characters to defend against wildcard injection.</li>
+    <li><b>Cookie Path Scoping:</b> The HTTP-only refresh token cookie is scoped strictly to <code>path: '/api/v1/auth'</code>, minimizing CSRF and cross-route exposure.</li>
+  </ul>
+
+  <h2 class="section-title">3.6 Data Structures & State Management Usage</h2>
+  <p>
+    On the client side, <b>TanStack Query v5</b> manages an in-memory asynchronous cache with reactive cache invalidation. When mutations (such as accepting an applicant or marking a task complete) succeed, the query keys <code>['task']</code>, <code>['wallet']</code>, and <code>['my-tasks']</code> are marked stale, triggering seamless background refetches.
+  </p>
+
+  <h2 class="section-title">3.7 Database Connectivity & Connection Pooling</h2>
+  <pre class="code-block">
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,                          // Hard concurrency ceiling
+  idleTimeoutMillis: 30000,         // 30s idle connection reclamation
+  connectionTimeoutMillis: 8000,    // 8s fail-fast timeout
+})
+  </pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 4 ================= -->
+<div>
+  <h1 class="chapter-title">Chapter 4: Results and Screenshots</h1>
+
+  <h2 class="section-title">4.1 Main Application Screen (Public Discovery)</h2>
+  <p>
+    The public feed available at <code>http://localhost:5173/feed</code> allows any campus student or visitor to browse open opportunities without logging in:
+  </p>
+  <div class="highlight-box">
+    <b>Marketplace Feed Features:</b>
+    <ul>
+      <li>Displays <b>17 category filter chips</b> across Technical (Frontend, Backend, ML, DevOps) and Non-Technical (Design, LaTeX, Tutoring) areas.</li>
+      <li>Shows task budget in soft credits, academic difficulty badges (Beginner, Intermediate, Advanced), and approaching deadlines.</li>
+      <li>Highlights <b>Faculty Workshops</b> displaying live attendee capacity counters (e.g., <i>"Git & GitHub CI/CD Workshop — 3/30 Participants"</i>).</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title">4.2 Functional Workflows (Poster, Worker, Admin)</h2>
+  <table class="data-table">
+    <tr>
+      <th>User Role</th>
+      <th>Showcase Account</th>
+      <th>Key Workflows Demonstrated</th>
+    </tr>
+    <tr>
+      <td><b>Poster (Client)</b></td>
+      <td><code>aarav.sharma@thapar.edu</code></td>
+      <td>Listing creation, inspecting competing applicants, one-click applicant acceptance (triggering escrow hold), deliverable proof approval</td>
+    </tr>
+    <tr>
+      <td><b>Worker (Freelancer)</b></td>
+      <td><code>priya.verma@thapar.edu</code></td>
+      <td>Personalized recommendations feed, proof-of-work URL upload, threaded task messaging, wallet ledger inspection (245 credits, 4.95 ★)</td>
+    </tr>
+    <tr>
+      <td><b>Faculty / Admin</b></td>
+      <td><code>dr.sharma@thapar.edu</code></td>
+      <td>Workshop scheduling with attendee limits, platform telemetry analytics, dispute queue arbitration (arbitrating frozen escrow)</td>
+    </tr>
+  </table>
+
+  <h2 class="section-title">4.3 Input & Output Demonstrations</h2>
+  <h3 class="subsection-title">1. Demonstration: Atomic Escrow Hold on Task Acceptance</h3>
+  <ul>
+    <li><b>Initial Balance:</b> Poster Aarav Sharma = 160.00 credits. Task Budget = 30.00 credits.</li>
+    <li><b>Input Action:</b> Aarav accepts Priya Verma's application for <i>"Optimize Next.js 15 Server Components"</i>.</li>
+    <li><b>Database Execution:</b> <code>holdEscrow()</code> locks Aarav's row, debits 30 credits, and logs an <code>escrow_hold</code> transaction. Competing applicant Rohit Kumar is automatically rejected.</li>
+    <li><b>Final Balance:</b> Aarav's balance updates to <b>130.00 credits</b>. Task state transitions to <code>ASSIGNED</code>.</li>
+  </ul>
+
+  <h3 class="subsection-title">2. Demonstration: Deliverable Submission & Escrow Release</h3>
+  <ul>
+    <li><b>Input Action:</b> Worker Priya uploads GitHub deliverable proof and Poster Aarav clicks <code>Complete & Release Escrow</code>.</li>
+    <li><b>Database Execution:</b> <code>releaseEscrow()</code> credits 30.00 to Priya's wallet, appends an <code>escrow_release</code> ledger entry, increments <code>completed_count</code>, and prompts mutual reviews.</li>
+    <li><b>Final Balance:</b> Priya's balance increases to <b>275.00 credits</b>. Task state transitions to <code>COMPLETED</code>.</li>
+  </ul>
+
+  <h2 class="section-title">4.4 Error Handling & Quality Gate Verification</h2>
+  <table class="data-table">
+    <tr>
+      <th>Test Suite File</th>
+      <th>Tests</th>
+      <th>Scenarios Validated</th>
+      <th>Result</th>
+    </tr>
+    <tr>
+      <td><code>src/edge-cases.test.ts</code></td>
+      <td>43</td>
+      <td>Auth edge cases, duplicate emails, password validation, listing creation, role barriers, application lifecycle, token refresh revocation on suspension, live Supabase queries</td>
+      <td><span class="metric-badge">43 / 43 PASSED</span></td>
+    </tr>
+    <tr>
+      <td><code>src/utils/schemas.test.ts</code></td>
+      <td>16</td>
+      <td>Zod boundary checks, <code>@thapar.edu</code> email format, password complexity, chronological date validation (<code>ends_at > starts_at</code>)</td>
+      <td><span class="metric-badge">16 / 16 PASSED</span></td>
+    </tr>
+    <tr>
+      <td><code>src/utils/wallet.test.ts</code></td>
+      <td>9</td>
+      <td>Escrow holds, release transfers, negative balance prevention, zero-budget edge cases, refund atomicity</td>
+      <td><span class="metric-badge">9 / 9 PASSED</span></td>
+    </tr>
+    <tr>
+      <td><code>src/utils/auth.test.ts</code></td>
+      <td>7</td>
+      <td>Bcrypt 12-round hashing, salt divergence, JWT signature tamper rejection, token expiry checks</td>
+      <td><span class="metric-badge">7 / 7 PASSED</span></td>
+    </tr>
+    <tr>
+      <td><code>src/utils/security.test.ts</code></td>
+      <td>4</td>
+      <td>Helmet security headers, authorization guards, path traversal filename sanitization</td>
+      <td><span class="metric-badge">4 / 4 PASSED</span></td>
+    </tr>
+    <tr>
+      <td><b>Total Verification Matrix</b></td>
+      <td><b>79</b></td>
+      <td><b>Full End-to-End Test Matrix</b></td>
+      <td><span class="metric-badge" style="background:#dcfce7; color:#15803d;">79 / 79 PASSED (100%)</span></td>
+    </tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= REFERENCES ================= -->
+<div>
+  <h1 class="chapter-title">References</h1>
+  <ol style="font-size: 10.5pt; line-height: 1.6;">
+    <li>Fowler, M. (2002). <i>Patterns of Enterprise Application Architecture</i>. Addison-Wesley Professional.</li>
+    <li>Fielding, R. T. (2000). <i>Architectural Styles and the Design of Network-based Software Architectures</i> (Doctoral dissertation, University of California, Irvine).</li>
+    <li>Silberschatz, A., Korth, H. F., & Sudarshan, S. (2019). <i>Database System Concepts</i> (7th ed.). McGraw-Hill Education.</li>
+    <li>PostgreSQL Global Development Group. (2026). <i>PostgreSQL 15 Documentation: Transaction Isolation and Explicit Locking</i>. https://www.postgresql.org/docs/15/transaction-iso.html</li>
+    <li>React Core Team. (2026). <i>React 19 Documentation: Server Components, Asset Loading & Hooks</i>. https://react.dev</li>
+    <li>TanStack. (2026). <i>TanStack Query v5 Documentation: Server State Synchronization</i>. https://tanstack.com/query/v5</li>
+    <li>Open Web Application Security Project (OWASP). (2025). <i>OWASP Top 10 API Security Risks</i>. https://owasp.org/www-project-api-security/</li>
+    <li>Internet Engineering Task Force (IETF). (2015). <i>RFC 7519: JSON Web Token (JWT)</i>. https://datatracker.ietf.org/doc/html/rfc7519</li>
+    <li>Provos, N., & Mazières, D. (1999). <i>A Future-Adaptable Password Scheme (bcrypt)</i>. In Proceedings of the FREENIX Track: 1999 USENIX Annual Technical Conference, pp. 81–91.</li>
+  </ol>
+</div>
+
+</body>
+</html>
