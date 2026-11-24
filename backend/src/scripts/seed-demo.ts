@@ -1,0 +1,675 @@
+import bcrypt from 'bcryptjs'
+import { pool } from '../config/db.js'
+
+async function seed() {
+  console.log('🌱 Starting comprehensive demo seed for CampusGigs...')
+
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+
+    // 1. Fetch Department and Category maps
+    const { rows: depts } = await client.query<{ id: string; code: string }>('SELECT id, code FROM departments')
+    const deptMap = new Map(depts.map((d) => [d.code, d.id]))
+
+    const { rows: cats } = await client.query<{ id: string; name: string }>('SELECT id, name FROM categories')
+    const catMap = new Map(cats.map((c) => [c.name, c.id]))
+
+    console.log(`✓ Loaded ${deptMap.size} departments and ${catMap.size} categories.`)
+
+    const defaultPassword = 'Password123!'
+    const passwordHash = await bcrypt.hash(defaultPassword, 10)
+
+    // 2. Define Showcase Users
+    const showcaseUsers = [
+      {
+        email: 'dr.sharma@thapar.edu',
+        fullName: 'Dr. Rajesh Sharma',
+        role: 'faculty',
+        deptCode: 'CSED',
+        rollId: 'EMP-CS-1042',
+        designation: 'Associate Professor & AI Lab Head',
+        experience: 'advanced',
+        bio: 'Associate Professor in CSED with 12+ years of research in Distributed Systems and Deep Learning. Faculty Coordinator for Campus Open Source.',
+        headline: 'Associate Professor | CSED Faculty Mentor',
+        skillTags: ['Distributed Systems', 'Python', 'Machine Learning', 'Cloud Computing', 'Git'],
+        canHostWorkshops: true,
+        isAdmin: true,
+        walletBalance: 200.0,
+        interests: ['Machine Learning', 'DevOps & Cloud', 'GitHub & Open Source', 'Data Science'],
+      },
+      {
+        email: 'aarav.sharma@thapar.edu',
+        fullName: 'Aarav Sharma',
+        role: 'ug_student',
+        deptCode: 'CSED',
+        rollId: '102103456',
+        year: 4,
+        experience: 'intermediate',
+        bio: 'Final year CS undergrad passionate about full-stack web engineering and microservices. Active open-source contributor and hackathon lead.',
+        headline: 'Final Year CS Undergrad | Full-Stack Developer',
+        skillTags: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Tailwind CSS', 'Docker'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 160.0,
+        interests: ['Frontend', 'Backend', 'Mobile Apps', 'DevOps & Cloud'],
+      },
+      {
+        email: 'priya.verma@thapar.edu',
+        fullName: 'Priya Verma',
+        role: 'ug_student',
+        deptCode: 'ECED',
+        rollId: '102203789',
+        year: 3,
+        experience: 'advanced',
+        bio: '3rd Year Electronics & Computing. Top-rated campus freelancer specializing in sleek React/Next.js interfaces, UI/UX prototyping, and embedded apps.',
+        headline: 'UI/UX Designer & React Frontend Specialist | 4.95 ★',
+        skillTags: ['React', 'Next.js', 'Figma', 'UI/UX Design', 'Tailwind CSS', 'Flutter', 'TypeScript'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 245.0,
+        avgRating: 4.95,
+        completedCount: 6,
+        interests: ['Frontend', 'Design & Creative', 'Mobile Apps', 'GitHub & Open Source'],
+      },
+      {
+        email: 'rohit.kumar@thapar.edu',
+        fullName: 'Rohit Kumar',
+        role: 'mtech',
+        deptCode: 'CSED',
+        rollId: '202302114',
+        year: 2,
+        experience: 'advanced',
+        bio: 'M.Tech Research Scholar focusing on Computer Vision and NLP. Published in IEEE workshops. Available for research consulting and advanced ML debugging.',
+        headline: 'M.Tech Research Scholar | Computer Vision & PyTorch',
+        skillTags: ['PyTorch', 'TensorFlow', 'Python', 'Computer Vision', 'NLP', 'LaTeX'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 125.0,
+        avgRating: 4.85,
+        completedCount: 4,
+        interests: ['Machine Learning', 'Data Science', 'Research Help', 'Tutoring & Academics'],
+      },
+      {
+        email: 'ananya.patel@thapar.edu',
+        fullName: 'Ananya Patel',
+        role: 'ug_student',
+        deptCode: 'CSED',
+        rollId: '102304891',
+        year: 2,
+        experience: 'intermediate',
+        bio: '2nd Year CS student. Graphic designer for college societies, newsletter editor, and frontend enthusiast.',
+        headline: 'Creative Designer & Content Strategist | 2nd Year UG',
+        skillTags: ['Graphic Design', 'Figma', 'Content Writing', 'Canva', 'HTML/CSS'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 110.0,
+        interests: ['Design & Creative', 'Content & Writing', 'Campus Errands'],
+      },
+      {
+        email: 'neha.singh@thapar.edu',
+        fullName: 'Neha Singh',
+        role: 'ug_student',
+        deptCode: 'EIED',
+        rollId: '102208123',
+        year: 3,
+        experience: 'intermediate',
+        bio: 'Instrumentation & IoT enthusiast. Loves building robotics projects, Arduino sensors, and data scrapers.',
+        headline: 'IoT & Embedded Systems Enthusiast | Robotics Team',
+        skillTags: ['Arduino', 'ESP32', 'Python', 'IoT', 'C++', 'Raspberry Pi'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 85.0,
+        interests: ['Backend', 'Technical (Other)', 'Lab & Project Support'],
+      },
+      {
+        email: 'kabir.manchanda@thapar.edu',
+        fullName: 'Kabir Manchanda',
+        role: 'ug_student',
+        deptCode: 'CSED',
+        rollId: '102103999',
+        year: 4,
+        experience: 'advanced',
+        bio: 'Senior student, backend builder, and coordinator for campus technical events.',
+        headline: 'Senior CS Undergrad | Project Coordinator',
+        skillTags: ['Node.js', 'Python', 'PostgreSQL', 'Express', 'Redis'],
+        canHostWorkshops: false,
+        isAdmin: false,
+        walletBalance: 150.0,
+        interests: ['Backend', 'DevOps & Cloud', 'Mentorship & Career'],
+      },
+    ]
+
+    const userMap = new Map<string, string>()
+
+    for (const u of showcaseUsers) {
+      // Upsert app_users
+      const { rows: userRows } = await client.query<{ id: string }>(
+        `INSERT INTO app_users (email, password_hash)
+         VALUES ($1, $2)
+         ON CONFLICT (email)
+         DO UPDATE SET password_hash = $2, updated_at = now()
+         RETURNING id`,
+        [u.email, passwordHash],
+      )
+      const userId = userRows[0].id
+      userMap.set(u.email, userId)
+
+      // Upsert profile
+      const deptId = deptMap.get(u.deptCode) || null
+      await client.query(
+        `INSERT INTO profiles (
+           id, full_name, college_email, campus_role, department_id,
+           roll_or_employee_id, year_of_study, designation, experience_level,
+           bio, headline, skill_tags, can_host_workshops, is_admin,
+           wallet_balance, avg_rating, completed_count, onboarding_completed, is_open_to_work
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,true,true)
+         ON CONFLICT (id) DO UPDATE SET
+           full_name = $2,
+           campus_role = $4,
+           department_id = $5,
+           roll_or_employee_id = $6,
+           year_of_study = $7,
+           designation = $8,
+           experience_level = $9,
+           bio = $10,
+           headline = $11,
+           skill_tags = $12,
+           can_host_workshops = $13,
+           is_admin = $14,
+           wallet_balance = $15,
+           avg_rating = $16,
+           completed_count = $17,
+           onboarding_completed = true,
+           is_open_to_work = true`,
+        [
+          userId,
+          u.fullName,
+          u.email,
+          u.role,
+          deptId,
+          u.rollId ?? null,
+          u.year ?? null,
+          u.designation ?? null,
+          u.experience ?? null,
+          u.bio,
+          u.headline,
+          u.skillTags,
+          u.canHostWorkshops,
+          u.isAdmin,
+          u.walletBalance,
+          u.avgRating ?? 0,
+          u.completedCount ?? 0,
+        ],
+      )
+
+      // Upsert interests
+      if (u.interests && u.interests.length > 0) {
+        for (const intName of u.interests) {
+          const catId = catMap.get(intName)
+          if (catId) {
+            await client.query(
+              `INSERT INTO user_interests (user_id, category_id)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id, category_id) DO NOTHING`,
+              [userId, catId],
+            )
+          }
+        }
+      }
+
+      // Record welcome signup bonus in ledger if not already recorded
+      await client.query(
+        `INSERT INTO transactions (to_user, amount, type)
+         SELECT $1, 100.00, 'signup_bonus'
+         WHERE NOT EXISTS (
+           SELECT 1 FROM transactions WHERE to_user = $1 AND type = 'signup_bonus'
+         )`,
+        [userId],
+      )
+    }
+
+    console.log(`✓ Upserted ${showcaseUsers.length} showcase users with password "${defaultPassword}".`)
+
+    // Helper IDs
+    const drSharmaId = userMap.get('dr.sharma@thapar.edu')!
+    const aaravId = userMap.get('aarav.sharma@thapar.edu')!
+    const priyaId = userMap.get('priya.verma@thapar.edu')!
+    const rohitId = userMap.get('rohit.kumar@thapar.edu')!
+    const ananyaId = userMap.get('ananya.patel@thapar.edu')!
+    const nehaId = userMap.get('neha.singh@thapar.edu')!
+    const kabirId = userMap.get('kabir.manchanda@thapar.edu')!
+
+    // Seed Priya's user_category_stats for recommendations test
+    const frontendCatId = catMap.get('Frontend')!
+    const designCatId = catMap.get('Design & Creative')!
+    await client.query(
+      `INSERT INTO user_category_stats (user_id, category_id, completed_count)
+       VALUES ($1, $2, 4), ($1, $3, 2)
+       ON CONFLICT (user_id, category_id)
+       DO UPDATE SET completed_count = EXCLUDED.completed_count`,
+      [priyaId, frontendCatId, designCatId],
+    )
+
+    // 3. Define Showcase Listings across all Archetypes and States
+    console.log('📌 Seeding listings across all lifecycle states...')
+
+    // A. Open Gigs (for browsing and live applying)
+    const openGigs = [
+      {
+        posterId: aaravId,
+        type: 'gig',
+        title: 'Debug PyTorch Loss Divergence in ResNet-50 Model',
+        description:
+          'Working on an image classification project for our Computer Vision lab. Loss explodes to NaN after epoch 12. Need an experienced ML engineer to inspect our gradient clipping, learning rate schedule, and custom cross-entropy loss implementation.',
+        category: 'Machine Learning',
+        difficulty: 'advanced',
+        budget: 35.0,
+        deadlineDays: 5,
+        mode: 'online',
+        targetDept: 'CSED',
+      },
+      {
+        posterId: aaravId,
+        type: 'gig',
+        title: 'Build React Native Navigation & Auth Flow for Fest App',
+        description:
+          'We have the backend APIs ready for the Saturnalia companion app. Need someone to wire up React Navigation 7, secure token storage with Expo SecureStore, and clean splash screen transitions.',
+        category: 'Mobile Apps',
+        difficulty: 'intermediate',
+        budget: 30.0,
+        deadlineDays: 7,
+        mode: 'online',
+        targetDept: 'CSED',
+      },
+      {
+        posterId: rohitId,
+        type: 'gig',
+        title: 'Format 8-Page Research Paper to IEEE Conference LaTeX Template',
+        description:
+          'Draft manuscript has been accepted for presentation. Need clean conversion from MS Word to IEEEtran LaTeX format, including subfigures, equation numbering, and BibTeX bibliography citations.',
+        category: 'Research Help',
+        difficulty: 'intermediate',
+        budget: 20.0,
+        deadlineDays: 4,
+        mode: 'online',
+        targetDept: 'CSED',
+      },
+      {
+        posterId: ananyaId,
+        type: 'gig',
+        title: 'Create 3D Blender Assets & Banner for Thapar Saturnalia Tech Stage',
+        description:
+          'Looking for a 3D artist proficient in Blender to model a futuristic cyberpunk campus mascot. Assets must be rendered with transparent background and delivered as high-resolution PNGs.',
+        category: 'Design & Creative',
+        difficulty: 'intermediate',
+        budget: 40.0,
+        deadlineDays: 8,
+        mode: 'hybrid',
+        targetDept: 'SOM',
+      },
+      {
+        posterId: nehaId,
+        type: 'gig',
+        title: 'One-on-One Tutoring: Discrete Mathematics & Graph Theory',
+        description:
+          'Need 3 tutoring sessions covering recurrence relations, Dijkstra algorithm proofs, and planar graphs before the mid-semester evaluation. Preference for someone with an A grade in CS Discrete Math.',
+        category: 'Tutoring & Academics',
+        difficulty: 'beginner',
+        budget: 15.0,
+        deadlineDays: 3,
+        venue: 'Central Library Study Room 2',
+        mode: 'in_person',
+        targetDept: 'CSED',
+      },
+      {
+        posterId: kabirId,
+        type: 'gig',
+        title: 'Dockerize Microservices Architecture & Write Compose File',
+        description:
+          'Containerize our Node.js auth service, Python recommendation engine, and Redis cache. Create a clean docker-compose.yml with healthchecks, environment files, and persistent volume mounts.',
+        category: 'DevOps & Cloud',
+        difficulty: 'advanced',
+        budget: 25.0,
+        deadlineDays: 6,
+        mode: 'online',
+        targetDept: 'CSED',
+      },
+    ]
+
+    for (const g of openGigs) {
+      const catId = catMap.get(g.category)!
+      const deptId = g.targetDept ? deptMap.get(g.targetDept) : null
+      await client.query(
+        `INSERT INTO tasks (
+           poster_id, listing_type, title, description, category_id, difficulty,
+           budget, deadline, venue, mode, target_department_id, status
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, now() + ($8 || ' days')::interval, $9, $10, $11, 'open')`,
+        [g.posterId, g.type, g.title, g.description, catId, g.difficulty, g.budget, g.deadlineDays, g.venue ?? null, g.mode, deptId],
+      )
+    }
+
+    // B. Faculty Workshops (Hosted by Dr. Sharma)
+    const workshops = [
+      {
+        title: 'Hands-on Workshop: Git, GitHub CI/CD & Open Source Workflows',
+        description:
+          'Learn practical industry Git techniques: interactive rebasing, merge conflict resolution, conventional commits, and setting up automated GitHub Actions CI/CD workflows for campus repositories.',
+        category: 'GitHub & Open Source',
+        difficulty: 'beginner',
+        venue: 'LP-108 Auditorium',
+        mode: 'in_person',
+        startDays: 3,
+        durationHours: 2,
+        maxParticipants: 30,
+        deptCode: 'CSED',
+      },
+      {
+        title: 'Industry Deep-Dive: Cloud Architecture with AWS & Docker',
+        description:
+          'Explore production cloud deployments. Topics include ECS Fargate containers, VPC networking, S3 static assets, and IAM role segregation for scalable university web services.',
+        category: 'DevOps & Cloud',
+        difficulty: 'intermediate',
+        venue: 'CSED Advanced Lab 3',
+        mode: 'in_person',
+        startDays: 5,
+        durationHours: 3,
+        maxParticipants: 25,
+        deptCode: 'CSED',
+      },
+    ]
+
+    for (const w of workshops) {
+      const catId = catMap.get(w.category)!
+      const deptId = deptMap.get(w.deptCode) || null
+      const { rows: tRows } = await client.query<{ id: string }>(
+        `INSERT INTO tasks (
+           poster_id, listing_type, title, description, category_id, difficulty,
+           venue, mode, starts_at, ends_at, max_participants, target_department_id, status
+         ) VALUES (
+           $1, 'workshop', $2, $3, $4, $5, $6, $7,
+           now() + ($8 || ' days')::interval,
+           now() + ($8 || ' days')::interval + ($9 || ' hours')::interval,
+           $10, $11, 'open'
+         ) RETURNING id`,
+        [drSharmaId, w.title, w.description, catId, w.difficulty, w.venue, w.mode, w.startDays, w.durationHours, w.maxParticipants, deptId],
+      )
+
+      // Add registered students to the first workshop to show capacity live!
+      if (w.title.includes('Git, GitHub')) {
+        const workshopId = tRows[0].id
+        for (const applicantId of [aaravId, priyaId, ananyaId]) {
+          await client.query(
+            `INSERT INTO applications (task_id, applicant_id, message, status)
+             VALUES ($1, $2, 'Excited to attend and practice Git branching!', 'pending')
+             ON CONFLICT (task_id, applicant_id) DO NOTHING`,
+            [workshopId, applicantId],
+          )
+        }
+      }
+    }
+
+    // C. Academic Collaborative Projects
+    const projects = [
+      {
+        posterId: nehaId,
+        title: 'Autonomous Ground Vehicle (AGV) Team — ROS2 & LiDAR Mapping',
+        description:
+          'Building a campus autonomous delivery prototype using TurtleBot, ROS2 Galactic, and SLAM mapping. Looking for team members interested in sensor fusion and path-planning algorithms.',
+        category: 'Technical (Other)',
+        difficulty: 'advanced',
+        budget: 50.0,
+        deadlineDays: 14,
+        venue: 'Robotics & Automation Lab',
+        mode: 'in_person',
+        deptCode: 'EIED',
+      },
+      {
+        posterId: kabirId,
+        title: 'Campus Food Delivery & Mess Queue Tracking App',
+        description:
+          'Collaborative project to build real-time queue estimation for hostel night canteens. Looking for a backend developer proficient in WebSockets and PostgreSQL query optimization.',
+        category: 'Backend',
+        difficulty: 'intermediate',
+        budget: 30.0,
+        deadlineDays: 10,
+        mode: 'hybrid',
+        deptCode: 'CSED',
+      },
+    ]
+
+    for (const p of projects) {
+      const catId = catMap.get(p.category)!
+      const deptId = deptMap.get(p.deptCode) || null
+      await client.query(
+        `INSERT INTO tasks (
+           poster_id, listing_type, title, description, category_id, difficulty,
+           budget, deadline, venue, mode, target_department_id, status
+         ) VALUES ($1, 'project', $2, $3, $4, $5, $6, now() + ($7 || ' days')::interval, $8, $9, $10, 'open')`,
+        [p.posterId, p.title, p.description, catId, p.difficulty, p.budget, p.deadlineDays, p.venue ?? null, p.mode, deptId],
+      )
+    }
+
+    // D. Mentorship Listings
+    const { rows: mentorTask } = await client.query<{ id: string }>(
+      `INSERT INTO tasks (
+         poster_id, listing_type, title, description, category_id, difficulty,
+         budget, deadline, mode, target_department_id, status
+       ) VALUES (
+         $1, 'mentorship',
+         'Placement Strategy: Cracking Product-Based SWE Interviews',
+         '1-on-1 personalized 45-minute mentorship session: resume review, LeetCode roadmap strategy, and mock behavioral interview prep.',
+         $2, 'beginner', 15.0, now() + interval '20 days', 'online', $3, 'open'
+       ) RETURNING id`,
+      [drSharmaId, catMap.get('Mentorship & Career')!, deptMap.get('CSED')!],
+    )
+
+    // 4. Tasks With Active State Demonstrations
+
+    // Scenario 1: Open Gig with 2 Competing Applicants (To demonstrate Accept / Cascading Rejection live!)
+    const { rows: competingTask } = await client.query<{ id: string }>(
+      `INSERT INTO tasks (
+         poster_id, listing_type, title, description, category_id, difficulty,
+         budget, deadline, mode, status
+       ) VALUES (
+         $1, 'gig',
+         'Optimize Next.js 15 Server Components & Image Caching',
+         'Need a frontend expert to diagnose LCP issues and configure Next.js Image caching headers for our society portal.',
+         $2, 'advanced', 30.0, now() + interval '5 days', 'online', 'open'
+       ) RETURNING id`,
+      [aaravId, catMap.get('Frontend')!],
+    )
+    const competingTaskId = competingTask[0].id
+    // Priya applied
+    await client.query(
+      `INSERT INTO applications (task_id, applicant_id, message, status)
+       VALUES ($1, $2, 'I have worked extensively with Next.js App Router and server actions. Can fix LCP in 24 hours.', 'pending')
+       ON CONFLICT (task_id, applicant_id) DO NOTHING`,
+      [competingTaskId, priyaId],
+    )
+    // Rohit applied
+    await client.query(
+      `INSERT INTO applications (task_id, applicant_id, message, status)
+       VALUES ($1, $2, 'I can inspect your caching headers and bundle chunk sizes.', 'pending')
+       ON CONFLICT (task_id, applicant_id) DO NOTHING`,
+      [competingTaskId, rohitId],
+    )
+
+    // Scenario 2: ASSIGNED Task (Escrow Held, Submit Work button active for worker)
+    const { rows: assignedTask } = await client.query<{ id: string }>(
+      `INSERT INTO tasks (
+         poster_id, worker_id, listing_type, title, description, category_id, difficulty,
+         budget, deadline, mode, status
+       ) VALUES (
+         $1, $2, 'gig',
+         'Design Responsive Landing Page for Robotics Society',
+         'Figma designs are finalized. Need a responsive Tailwind CSS + React landing page with hero animation, member grid, and event timeline.',
+         $3, 'intermediate', 25.0, now() + interval '3 days', 'online', 'assigned'
+       ) RETURNING id`,
+      [aaravId, priyaId, catMap.get('Frontend')!],
+    )
+    const assignedTaskId = assignedTask[0].id
+    // Record escrow hold in ledger
+    await client.query(
+      `INSERT INTO transactions (task_id, from_user, amount, type)
+       VALUES ($1, $2, 25.0, 'escrow_hold')`,
+      [assignedTaskId, aaravId],
+    )
+    // Active chat messages
+    await client.query(
+      `INSERT INTO messages (task_id, sender_id, content) VALUES
+       ($1, $2, 'Hi Priya! Thanks for taking up the design task. The Figma link is in your email.'),
+       ($1, $3, 'Got it Aarav! Reviewing the components now. Will have the mobile responsive layout ready by tonight.'),
+       ($1, $2, 'Awesome, let me know if you need any asset exports.')`,
+      [assignedTaskId, aaravId, priyaId],
+    )
+
+    // Scenario 3: SUBMITTED Task (Proof attached, Review & Complete button active for poster!)
+    const { rows: submittedTask } = await client.query<{ id: string }>(
+      `INSERT INTO tasks (
+         poster_id, worker_id, listing_type, title, description, category_id, difficulty,
+         budget, deadline, mode, proof_url, status
+       ) VALUES (
+         $1, $2, 'gig',
+         'Build REST API for Campus Room Booking with PostgreSQL',
+         'Need Express.js routes for checking slot availability, preventing double-bookings, and filtering rooms by AC/projector capacity.',
+         $3, 'intermediate', 30.0, now() + interval '2 days', 'online',
+         'https://github.com/campusgigs-demo/room-booking-api', 'submitted'
+       ) RETURNING id`,
+      [aaravId, priyaId, catMap.get('Backend')!],
+    )
+    const submittedTaskId = submittedTask[0].id
+    await client.query(
+      `INSERT INTO transactions (task_id, from_user, amount, type)
+       VALUES ($1, $2, 30.0, 'escrow_hold')`,
+      [submittedTaskId, aaravId],
+    )
+    await client.query(
+      `INSERT INTO notifications (user_id, type, payload)
+       VALUES ($1, 'work_submitted', $2)`,
+      [aaravId, JSON.stringify({ task_id: submittedTaskId, title: 'Build REST API for Campus Room Booking' })],
+    )
+
+    // Scenario 4: COMPLETED Tasks with Reviews & Ratings
+    const completedTasks = [
+      {
+        posterId: rohitId,
+        workerId: priyaId,
+        title: 'Optimize PostgreSQL Queries & Indexes for Capstone Database',
+        category: 'Backend',
+        budget: 25.0,
+        starsP: 5,
+        reviewP: 'Fantastic work! Priya diagnosed our slow table scans, added B-tree indexes, and reduced query latency by 75%.',
+        starsW: 5,
+        reviewW: 'Clear schema documentation and prompt feedback. Pleasure working with Rohit!',
+      },
+      {
+        posterId: aaravId,
+        workerId: ananyaId,
+        title: 'Figma to Tailwind CSS Component Conversion',
+        category: 'Design & Creative',
+        budget: 20.0,
+        starsP: 5,
+        reviewP: 'Pixel-perfect conversion and clean semantic HTML. Delivered a day ahead of the deadline.',
+        starsW: 5,
+        reviewW: 'Great communication and prompt escrow release. Would gladly collaborate again.',
+      },
+      {
+        posterId: nehaId,
+        workerId: priyaId,
+        title: 'MATLAB DSP Signal Filtering & FFT Spectrum Analysis',
+        category: 'Lab & Project Support',
+        budget: 20.0,
+        starsP: 5,
+        reviewP: 'Very clear step-by-step comments in the .m script and helped explain the Butterworth filter cutoff.',
+        starsW: 5,
+        reviewW: 'Provided clean lab data files and was super helpful throughout.',
+      },
+    ]
+
+    for (const c of completedTasks) {
+      const catId = catMap.get(c.category)!
+      const { rows: compRow } = await client.query<{ id: string }>(
+        `INSERT INTO tasks (
+           poster_id, worker_id, listing_type, title, description, category_id, difficulty,
+           budget, mode, status
+         ) VALUES (
+           $1, $2, 'gig', $3, 'Delivered and verified campus gig.',
+           $4, 'intermediate', $5, 'online', 'completed'
+         ) RETURNING id`,
+        [c.posterId, c.workerId, c.title, catId, c.budget],
+      )
+      const cTaskId = compRow[0].id
+
+      // Escrow hold and release records
+      await client.query(
+        `INSERT INTO transactions (task_id, from_user, to_user, amount, type) VALUES
+         ($1, $2, null, $4, 'escrow_hold'),
+         ($1, $2, $3, $4, 'escrow_release')`,
+        [cTaskId, c.posterId, c.workerId, c.budget],
+      )
+
+      // Mutual reviews
+      await client.query(
+        `INSERT INTO reviews (task_id, reviewer_id, reviewee_id, stars, comment) VALUES
+         ($1, $2, $3, $4, $5),
+         ($1, $3, $2, $6, $7)`,
+        [cTaskId, c.posterId, c.workerId, c.starsP, c.reviewP, c.starsW, c.reviewW],
+      )
+    }
+
+    // Scenario 5: DISPUTED Task (For Teacher Demo of Admin Resolution Queue!)
+    const { rows: disputedTask } = await client.query<{ id: string }>(
+      `INSERT INTO tasks (
+         poster_id, worker_id, listing_type, title, description, category_id, difficulty,
+         budget, deadline, mode, status
+       ) VALUES (
+         $1, $2, 'gig',
+         'Scrape Campus Course Catalog & Build Search API',
+         'Build a Python script using BeautifulSoup and SQLite to index all Thapar elective descriptions.',
+         $3, 'intermediate', 30.0, now() - interval '1 day', 'online', 'disputed'
+       ) RETURNING id`,
+      [kabirId, nehaId, catMap.get('Backend')!],
+    )
+    const disputedTaskId = disputedTask[0].id
+    await client.query(
+      `INSERT INTO transactions (task_id, from_user, amount, type)
+       VALUES ($1, $2, 30.0, 'escrow_hold')`,
+      [disputedTaskId, kabirId],
+    )
+    await client.query(
+      `INSERT INTO disputes (task_id, raised_by, reason, status)
+       VALUES ($1, $2, 'Submitted script crashes on pages with infinite scroll and documentation was omitted.', 'open')`,
+      [disputedTaskId, kabirId],
+    )
+
+    // Unread Notifications for Showcase
+    await client.query(
+      `INSERT INTO notifications (user_id, type, payload) VALUES
+       ($1, 'new_application', $4),
+       ($2, 'task_assigned', $5),
+       ($3, 'new_dispute', $6)`,
+      [
+        aaravId,
+        priyaId,
+        drSharmaId,
+        JSON.stringify({ task_id: competingTaskId, title: 'Optimize Next.js 15 Server Components' }),
+        JSON.stringify({ task_id: assignedTaskId, title: 'Design Responsive Landing Page for Robotics Society' }),
+        JSON.stringify({ task_id: disputedTaskId, title: 'Scrape Campus Course Catalog & Build Search API' }),
+      ],
+    )
+
+    await client.query('COMMIT')
+    console.log('🎉 REAL SHOWCASE SEED DATA INSERTED SUCCESSFULLY!')
+  } catch (err) {
+    await client.query('ROLLBACK')
+    console.error('❌ Error seeding demo data:', err)
+    throw err
+  } finally {
+    client.release()
+  }
+}
+
+seed()
+  .then(() => process.exit(0))
+  .catch(() => process.exit(1))
