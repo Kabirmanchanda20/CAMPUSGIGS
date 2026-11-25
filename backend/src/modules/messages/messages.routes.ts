@@ -6,6 +6,8 @@ import { validate } from '../../middleware/validate.js'
 import { query } from '../../config/db.js'
 import { AppError } from '../../utils/AppError.js'
 
+import { getIO } from '../../socket.js'
+
 export const messagesRouter = Router()
 
 messagesRouter.get(
@@ -49,10 +51,11 @@ messagesRouter.post(
     if (req.user!.id !== task.poster_id && req.user!.id !== task.worker_id) {
       throw new AppError(403, 'FORBIDDEN', 'Participants only')
     }
-    const { rows } = await query(
-      `insert into messages (task_id, sender_id, content) values ($1,$2,$3) returning *`,
+    const { rows: inserted } = await query(
+      `insert into messages (task_id, sender_id, content) values ($1,$2,$3) returning id`,
       [req.body.task_id, req.user!.id, req.body.content],
     )
+
     const other = req.user!.id === task.poster_id ? task.worker_id : task.poster_id
     if (other) {
       await query(
@@ -60,7 +63,34 @@ messagesRouter.post(
         [other, JSON.stringify({ task_id: req.body.task_id })],
       )
     }
-    res.status(201).json({ success: true, data: rows[0] })
+
+    // Fetch full message with sender details
+    const { rows: fullMessage } = await query(
+      `select m.*, json_build_object('id', p.id, 'full_name', p.full_name, 'avatar_url', p.avatar_url) as sender
+       from messages m join profiles p on p.id = m.sender_id
+       where m.id = $1`,
+      [inserted[0].id],
+    )
+
+    const payload = fullMessage[0]
+
+    // Real-time WebSocket emission to all participants in this task room
+    try {
+      const io = getIO()
+      if (io) {
+        io.to(`task:${req.body.task_id}`).emit('message:new', payload)
+        if (other) {
+          io.to(`user:${other}`).emit('notification:new', {
+            type: 'new_message',
+            taskId: req.body.task_id,
+          })
+        }
+      }
+    } catch (err) {
+      console.error('[WebSocket] Broadcast error:', err)
+    }
+
+    res.status(201).json({ success: true, data: payload })
   }),
 )
 

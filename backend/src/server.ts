@@ -1,6 +1,7 @@
 import { createApp } from './app.js'
 import { env } from './config/env.js'
 import { pool } from './config/db.js'
+import { initSocket } from './socket.js'
 
 async function main() {
   // Fail fast if DB is unreachable
@@ -11,10 +12,15 @@ async function main() {
     console.log(`CampusGigs API listening on http://localhost:${env.PORT}`)
   })
 
+  const io = initSocket(server)
+  console.log('✓ WebSocket server initialized on Socket.IO')
+
   const shutdown = () => {
-    server.close(async () => {
-      await pool.end()
-      process.exit(0)
+    io.close(() => {
+      server.close(async () => {
+        await pool.end()
+        process.exit(0)
+      })
     })
   }
 

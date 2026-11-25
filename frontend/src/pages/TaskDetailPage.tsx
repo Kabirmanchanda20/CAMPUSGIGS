@@ -11,7 +11,12 @@ import {
   useTaskApplications,
 } from '../features/applications/api'
 import { useCreateReview, useRaiseDispute, useTaskReviews } from '../features/disputes/api'
-import { useSendMessage, useTaskMessages } from '../features/messaging/api'
+import {
+  useSendMessage,
+  useSocketStatus,
+  useTaskMessages,
+  useTypingIndicator,
+} from '../features/messaging/api'
 import {
   useCancelTask,
   useCompleteOpenWorkshop,
@@ -51,6 +56,9 @@ export function TaskDetailPage() {
   const raiseDispute = useRaiseDispute()
   const createReview = useCreateReview()
   const sendMessage = useSendMessage()
+
+  const isSocketConnected = useSocketStatus()
+  const { typingUser, sendTyping } = useTypingIndicator(task?.id)
 
   const [applyMsg, setApplyMsg] = useState('')
   const [proofUrl, setProofUrl] = useState('')
@@ -105,6 +113,7 @@ export function TaskDetailPage() {
   const onSend = (e: FormEvent) => {
     e.preventDefault()
     if (!user || !chat.trim()) return
+    sendTyping(false)
     void run(async () => {
       await sendMessage.mutateAsync({
         task_id: task.id,
@@ -390,7 +399,18 @@ export function TaskDetailPage() {
 
         {isParticipant && (
           <section>
-            <h2 className="font-display text-lg font-semibold text-forest-900">Messages</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold text-forest-900">Messages</h2>
+              <span className="flex items-center gap-1.5 text-xs text-muted">
+                <span
+                  className={`inline-block h-2 w-2 rounded-full ${
+                    isSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'
+                  }`}
+                />
+                {isSocketConnected ? 'Real-time Live' : 'Connecting…'}
+              </span>
+            </div>
+
             <div className="mt-3 max-h-80 space-y-3 overflow-y-auto rounded-xl border border-border bg-white/60 p-3">
               {messages.length === 0 && (
                 <p className="text-sm text-muted">No messages yet. Say hello.</p>
@@ -405,8 +425,23 @@ export function TaskDetailPage() {
                 </div>
               ))}
             </div>
+
+            {typingUser && (
+              <p className="mt-2 text-xs italic text-emerald-700 animate-pulse">
+                {typingUser} is typing…
+              </p>
+            )}
+
             <form onSubmit={onSend} className="mt-3 flex gap-2">
-              <Input value={chat} onChange={(e) => setChat(e.target.value)} placeholder="Message…" />
+              <Input
+                value={chat}
+                onChange={(e) => {
+                  setChat(e.target.value)
+                  sendTyping(e.target.value.trim().length > 0)
+                }}
+                onBlur={() => sendTyping(false)}
+                placeholder="Message…"
+              />
               <Button type="submit" disabled={sendMessage.isPending}>
                 Send
               </Button>
