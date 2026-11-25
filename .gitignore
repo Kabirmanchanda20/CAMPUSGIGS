@@ -39,3 +39,6 @@ frontend/dist/
 # Supabase local
 supabase/.branches
 supabase/.temp
+
+# Documentation & Generated Reports
+docs/
