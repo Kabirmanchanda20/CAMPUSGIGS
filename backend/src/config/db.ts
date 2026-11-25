@@ -11,6 +11,11 @@ export const pool = new Pool({
   connectionTimeoutMillis: 8_000,
 })
 
+// Handle idle client errors so unexpected connection drops (e.g. Supabase pooler resets) don't crash Node
+pool.on('error', (err) => {
+  console.error('[DB Pool] Unexpected error on idle client:', err.message)
+})
+
 export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   text: string,
   params?: unknown[],
